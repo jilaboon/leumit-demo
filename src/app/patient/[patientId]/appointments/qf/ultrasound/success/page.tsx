@@ -102,10 +102,10 @@ export default function SuccessPage({
           קביעת תור נוסף
         </button>
         <button
-          onClick={() => router.push(`/patient/${patientId}/appointments`)}
+          onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
           className="px-6 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 transition-colors"
         >
-          חזרה למבט 360°
+          חזרה לזימון תורים
         </button>
       </div>
     </div>

@@ -61,12 +61,8 @@ export default function BookPage({
     <div className="animate-fade-in">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <button onClick={() => router.push(`/patient/${patientId}/appointments`)} className="hover:text-teal-600 transition-colors">
-          מבט 360°
-        </button>
-        <span>←</span>
         <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-teal-600 transition-colors">
-          מרכז זימון תורים
+          זימון תור חדש
         </button>
         <span>←</span>
         <span className="text-gray-900 font-medium">חיפוש תור אולטרסאונד</span>

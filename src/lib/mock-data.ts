@@ -138,8 +138,8 @@ export const availableSlots: AvailableSlot[] = [
 
 // ─── Service Categories ───
 export const serviceCategories: ServiceCategory[] = [
-  { id: 'family', name: 'רפואת משפחה / ילדים', icon: '👨‍👩‍👧‍👦', isQF: false },
-  { id: 'consultant', name: 'רפואה מייעצת', icon: '🩺', isQF: false },
+  { id: 'family', name: 'רפואה ראשונית', icon: '👨‍👩‍👧‍👦', isQF: false },
+  { id: 'consultant', name: 'רפואה יועצת', icon: '🩺', isQF: false },
   { id: 'ultrasound', name: 'אולטרסאונד', icon: '📡', isQF: true },
   { id: 'institutes', name: 'מכונים', icon: '🏥', isQF: false },
   { id: 'complementary', name: 'רפואה משלימה', icon: '🌿', isQF: false },

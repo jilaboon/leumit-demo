@@ -65,8 +65,8 @@ export default function ConfirmPage({
     <div className="animate-fade-in max-w-2xl mx-auto">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <button onClick={() => router.push(`/patient/${patientId}/appointments`)} className="hover:text-teal-600 transition-colors">
-          מבט 360°
+        <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-teal-600 transition-colors">
+          זימון תור חדש
         </button>
         <span>←</span>
         <button onClick={() => router.push(`/patient/${patientId}/appointments/qf/ultrasound/book`)} className="hover:text-teal-600 transition-colors">
