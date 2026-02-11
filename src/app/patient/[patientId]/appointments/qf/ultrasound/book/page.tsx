@@ -340,9 +340,10 @@ export default function BookPage({
           ) : (
             <>
               {/* Table header */}
-              <div className="hidden sm:grid grid-cols-[1fr_1fr_auto_auto_auto] gap-4 px-5 py-2.5 border-b border-gray-100 text-xs font-medium text-gray-500">
+              <div className="hidden sm:grid grid-cols-[1fr_1fr_auto_auto_auto_auto] gap-4 px-5 py-2.5 border-b border-gray-100 text-xs font-medium text-gray-500">
                 <span>מרפאה</span>
                 <span>כתובת</span>
+                <span className="w-14 text-center">יום</span>
                 <span className="w-20 text-center">תאריך</span>
                 <span className="w-16 text-center">שעה</span>
                 <span className="w-16 text-center">מרחק</span>
@@ -355,7 +356,7 @@ export default function BookPage({
                     key={slot.id}
                     onClick={() => setSelectedSlot(slot)}
                     className={`
-                      w-full px-5 py-3.5 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto_auto_auto] gap-2 sm:gap-4 items-center text-right transition-all
+                      w-full px-5 py-3.5 grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto_auto_auto_auto] gap-2 sm:gap-4 items-center text-right transition-all
                       ${selectedSlot?.id === slot.id
                         ? 'bg-teal-50 border-r-4 border-teal-500'
                         : 'hover:bg-gray-50'
@@ -367,6 +368,11 @@ export default function BookPage({
 
                     {/* City / Address */}
                     <div className="text-sm text-gray-600">{slot.clinic.city}</div>
+
+                    {/* Day */}
+                    <div className="w-14 text-center text-sm text-gray-600">
+                      {new Date(slot.startISO).toLocaleDateString('he-IL', { weekday: 'short' })}
+                    </div>
 
                     {/* Date */}
                     <div className="w-20 text-center text-sm font-medium text-gray-900">{formatDate(slot.startISO)}</div>
