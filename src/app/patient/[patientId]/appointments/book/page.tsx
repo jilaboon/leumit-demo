@@ -52,10 +52,6 @@ export default function AppointmentsCenterPage({
           const lastApt = store.getLastAppointmentByCategory(patientId, svc.category);
 
           const contextRows = [
-            { label: 'סניף ברירת מחדל', value: patient.branch.name },
-            ...(svc.category === 'Family' || svc.category === 'Consultant'
-              ? [{ label: 'רופא/ה מטפל/ת', value: patient.assignedDoctor.name }]
-              : []),
             {
               label: 'תור הבא',
               value: nextApt
