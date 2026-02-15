@@ -47,6 +47,22 @@ export default function AppointmentsCenterPage({
 
       {/* Service Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Referrals card */}
+        <ServiceCard
+          title="הפניות"
+          subtitle="צפייה וניהול הפניות מטופל"
+          icon="📄"
+          highlighted={true}
+          statusBadge={{ label: 'זמין', variant: 'available' }}
+          contextRows={[
+            { label: 'הפניות פתוחות', value: `${store.getAllPatientReferrals(patientId).filter(r => r.status === 'Open').length}`, emphasis: true },
+          ]}
+          primaryAction={{
+            label: 'צפייה בהפניות',
+            href: `/patient/${patientId}/referrals`,
+          }}
+        />
+
         {SERVICES.map((svc) => {
           const nextApt = store.getNextAppointmentByCategory(patientId, svc.category);
           const lastApt = store.getLastAppointmentByCategory(patientId, svc.category);

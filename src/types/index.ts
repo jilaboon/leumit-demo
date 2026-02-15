@@ -29,9 +29,13 @@ export interface Referral {
   patientId: string;
   familyId: string;
   type: string;
+  examCode: string;
+  examName: string;
+  referringDoctor: string;
+  referralNumber: string;
   createdISO: string;
   expiresISO: string;
-  status: 'Open' | 'Used' | 'Expired';
+  status: 'Open' | 'Used' | 'Expired' | 'Canceled';
 }
 
 export interface Commitment {

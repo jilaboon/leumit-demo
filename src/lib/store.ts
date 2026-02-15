@@ -25,6 +25,7 @@ export interface AppStore extends AppState {
   getLastAppointmentByCategory: (patientId: string, category: Appointment['serviceCategory']) => Appointment | undefined;
   getAllFutureAppointments: (patientId: string) => Appointment[];
   getReferrals: (patientId: string) => Referral[];
+  getAllPatientReferrals: (patientId: string) => Referral[];
   getFamilyReferrals: (familyId: string) => Referral[];
   getCommitments: (patientId: string) => Commitment[];
   getFamilyCommitments: (familyId: string) => Commitment[];
@@ -96,6 +97,11 @@ export function createStore(state: AppState, setState: (s: AppState) => void): A
     getReferrals: (patientId: string) =>
       state.referrals
         .filter(r => r.patientId === patientId && new Date(r.createdISO) >= sixMonthsAgo)
+        .sort((a, b) => new Date(b.createdISO).getTime() - new Date(a.createdISO).getTime()),
+
+    getAllPatientReferrals: (patientId: string) =>
+      state.referrals
+        .filter(r => r.patientId === patientId)
         .sort((a, b) => new Date(b.createdISO).getTime() - new Date(a.createdISO).getTime()),
 
     getFamilyReferrals: (familyId: string) =>

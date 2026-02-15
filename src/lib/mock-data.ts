@@ -97,12 +97,20 @@ export const initialAppointments: Appointment[] = [
 
 // ─── Referrals ───
 export const initialReferrals: Referral[] = [
-  { id: 'REF-001', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לאולטרסאונד בטן', createdISO: daysAgo(60), expiresISO: daysFromNow(30), status: 'Open' },
-  { id: 'REF-002', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לייעוץ קרדיולוגי', createdISO: daysAgo(45), expiresISO: daysAgo(5), status: 'Used' },
-  { id: 'REF-003', patientId: '987654321', familyId: 'FAM-001', type: 'הפניה לאולטרסאונד שד', createdISO: daysAgo(100), expiresISO: daysAgo(10), status: 'Used' },
-  { id: 'REF-004', patientId: '987654321', familyId: 'FAM-001', type: 'הפניה לגינקולוג', createdISO: daysAgo(30), expiresISO: daysFromNow(60), status: 'Open' },
-  { id: 'REF-005', patientId: '111222333', familyId: 'FAM-001', type: 'הפניה לאולטרסאונד בטן', createdISO: daysAgo(25), expiresISO: daysFromNow(65), status: 'Open' },
-  { id: 'REF-006', patientId: '111222333', familyId: 'FAM-001', type: 'הפניה לרופא עיניים', createdISO: daysAgo(150), expiresISO: daysAgo(60), status: 'Expired' },
+  // David
+  { id: 'REF-001', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לבדיקות דם', examCode: 'BLD-100', examName: 'בדיקות דם', referringDoctor: 'ד"ר רחל לוי', referralNumber: 'HP-20250801', createdISO: daysAgo(30), expiresISO: daysFromNow(60), status: 'Open' },
+  { id: 'REF-002', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לקרדיולוג', examCode: 'CRD-200', examName: 'קרדיולוג', referringDoctor: 'ד"ר רחל לוי', referralNumber: 'HP-20250645', createdISO: daysAgo(90), expiresISO: daysAgo(5), status: 'Used' },
+  { id: 'REF-003', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לבדיקת אק"ג', examCode: 'ECG-300', examName: 'בדיקת אק"ג', referringDoctor: 'ד"ר דנה פרידמן', referralNumber: 'HP-20250590', createdISO: daysAgo(120), expiresISO: daysAgo(30), status: 'Expired' },
+  { id: 'REF-004', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לאולטרסאונד בטן', examCode: 'US-101', examName: 'אולטרסאונד בטן', referringDoctor: 'ד"ר רחל לוי', referralNumber: 'HP-20250422', createdISO: daysAgo(60), expiresISO: daysFromNow(30), status: 'Open' },
+  { id: 'REF-005', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לפעילות גופנית לגיל השלישי', examCode: 'FIT-400', examName: 'פעילות גופנית לגיל השלישי', referringDoctor: 'ד"ר רחל לוי', referralNumber: 'HP-20250310', createdISO: daysAgo(180), expiresISO: daysAgo(90), status: 'Canceled' },
+  { id: 'REF-006', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לטיפול פיזיותרפי פרטני', examCode: 'PHY-500', examName: 'טיפול פיזיותרפי פרטני', referringDoctor: 'ד"ר יוסי מזרחי', referralNumber: 'HP-20250287', createdISO: daysAgo(45), expiresISO: daysFromNow(45), status: 'Open' },
+  { id: 'REF-007', patientId: '123456789', familyId: 'FAM-001', type: 'הפניה לשירות סוציאלי', examCode: 'SOC-600', examName: 'שירות סוציאלי', referringDoctor: 'ד"ר רחל לוי', referralNumber: 'HP-20250155', createdISO: daysAgo(200), expiresISO: daysAgo(110), status: 'Used' },
+  // Sarah
+  { id: 'REF-008', patientId: '987654321', familyId: 'FAM-001', type: 'הפניה לאולטרסאונד שד', examCode: 'US-201', examName: 'אולטרסאונד שד', referringDoctor: 'ד"ר מיכל אברהם', referralNumber: 'HP-20250830', createdISO: daysAgo(100), expiresISO: daysAgo(10), status: 'Used' },
+  { id: 'REF-009', patientId: '987654321', familyId: 'FAM-001', type: 'הפניה לגינקולוג', examCode: 'GYN-700', examName: 'גינקולוג', referringDoctor: 'ד"ר מיכל אברהם', referralNumber: 'HP-20250760', createdISO: daysAgo(30), expiresISO: daysFromNow(60), status: 'Open' },
+  // Noam
+  { id: 'REF-010', patientId: '111222333', familyId: 'FAM-001', type: 'הפניה לאולטרסאונד בטן', examCode: 'US-101', examName: 'אולטרסאונד בטן', referringDoctor: 'ד"ר יוסי מזרחי', referralNumber: 'HP-20250900', createdISO: daysAgo(25), expiresISO: daysFromNow(65), status: 'Open' },
+  { id: 'REF-011', patientId: '111222333', familyId: 'FAM-001', type: 'הפניה לרופא עיניים', examCode: 'EYE-800', examName: 'רופא עיניים', referringDoctor: 'ד"ר יוסי מזרחי', referralNumber: 'HP-20250050', createdISO: daysAgo(150), expiresISO: daysAgo(60), status: 'Expired' },
 ];
 
 // ─── Commitments ───
