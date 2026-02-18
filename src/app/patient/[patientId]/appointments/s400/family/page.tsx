@@ -6,6 +6,47 @@ import { useStore } from '@/lib/store';
 import { formatDate, formatTime } from '@/lib/utils';
 import { familyDoctorSlots } from '@/lib/mock-data';
 
+function BossaToolbar() {
+  return (
+    <div className="bg-gradient-to-b from-[#e8ecf0] to-[#d4dae0] border border-gray-400 px-1.5 py-0.5 flex items-center gap-0.5 mb-3">
+      {[
+        { icon: '🖨️', label: 'הדפסה' },
+        { icon: '🔄', label: 'רענון' },
+        { icon: '📋', label: 'העתקה' },
+        { icon: '❓', label: 'עזרה' },
+      ].map((btn) => (
+        <button
+          key={btn.label}
+          className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-gray-600 hover:bg-[#c8d0d8] border border-transparent hover:border-gray-400 rounded-sm transition-colors"
+        >
+          <span className="text-xs">{btn.icon}</span>
+          {btn.label}
+        </button>
+      ))}
+      <div className="flex-1" />
+      <span className="text-[9px] text-gray-400">F1=עזרה | F5=רענון</span>
+    </div>
+  );
+}
+
+function BossaStatusBar({ branchName }: { branchName: string }) {
+  return (
+    <div className="mt-4 bg-[#e0e4e8] border border-gray-400 px-3 py-1 flex items-center justify-between text-[10px] text-gray-500">
+      <div className="flex items-center gap-3">
+        <span>Bossa Nova v8.4.2</span>
+        <span className="text-gray-300">|</span>
+        <span>מודול: רפואת משפחה</span>
+        <span className="text-gray-300">|</span>
+        <span>סניף: {branchName}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+        <span>מחובר</span>
+      </div>
+    </div>
+  );
+}
+
 export default function FamilyDoctorPage({
   params,
 }: {
@@ -29,35 +70,44 @@ export default function FamilyDoctorPage({
     const slot = familyDoctorSlots.find((s) => s.id === selectedSlotId);
     return (
       <div className="animate-fade-in">
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mb-3">
           <button
             onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
-            className="hover:text-blue-600 transition-colors"
+            className="hover:text-[#4472C4] underline"
           >
             זימון תור חדש
           </button>
-          <span>←</span>
-          <span className="text-gray-900 font-medium">רפואה ראשונית</span>
+          <span>&laquo;</span>
+          <span className="text-gray-700 font-medium">רפואה ראשונית</span>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-          <div className="text-5xl mb-4">&#x2705;</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">תור נקבע בהצלחה</h2>
-          <p className="text-sm text-gray-600 mb-6">
-            תור ל{patient.assignedDoctor.name} נקבע בהצלחה
-            {slot && (
-              <>
-                {' '}לתאריך {formatDate(slot.time)} בשעה {formatTime(slot.time)}
-              </>
-            )}
-          </p>
-          <button
-            onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
-            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
-            חזרה לזימון תורים
-          </button>
+        <BossaToolbar />
+
+        <div className="border border-green-700 bg-[#e8f5e9] p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-5 h-5 bg-green-600 text-white text-xs flex items-center justify-center font-bold">V</span>
+            <h2 className="text-sm font-bold text-green-900">פעולה הושלמה — תור נקבע בהצלחה</h2>
+          </div>
+          <div className="border border-green-300 bg-white p-3 text-xs text-gray-700 leading-relaxed">
+            <p>
+              תור ל{patient.assignedDoctor.name} נקבע בהצלחה
+              {slot && (
+                <> לתאריך {formatDate(slot.time)} בשעה {formatTime(slot.time)}</>
+              )}
+            </p>
+            <p className="mt-1 text-gray-500">מספר אסמכתא: BN-{Date.now().toString().slice(-6)}</p>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
+              className="px-4 py-1.5 bg-[#4472C4] text-white text-xs font-medium border border-[#2F5496] hover:bg-[#3a64b0] transition-colors"
+            >
+              חזרה לזימון תורים
+            </button>
+          </div>
         </div>
+
+        <BossaStatusBar branchName={patient.branch.name} />
       </div>
     );
   }
@@ -65,86 +115,117 @@ export default function FamilyDoctorPage({
   return (
     <div className="animate-fade-in">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+      <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mb-3">
         <button
           onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
-          className="hover:text-blue-600 transition-colors"
+          className="hover:text-[#4472C4] underline"
         >
           זימון תור חדש
         </button>
-        <span>←</span>
-        <span className="text-gray-900 font-medium">רפואה ראשונית</span>
+        <span>&laquo;</span>
+        <span className="text-gray-700 font-medium">רפואה ראשונית</span>
       </div>
 
-      <h2 className="text-xl font-bold text-gray-900 mb-6">רפואה ראשונית — תור לרופא/ת משפחה</h2>
+      <BossaToolbar />
 
-      {/* Doctor info */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-xl">
-            &#x1F468;&#x200D;&#x2695;&#xFE0F;
+      {/* Doctor info panel */}
+      <div className="border border-gray-400 bg-[#f4f4f4] mb-3">
+        <div className="bg-gradient-to-b from-[#d0d8e8] to-[#b8c4d8] px-3 py-1.5 border-b border-gray-400">
+          <span className="text-[11px] font-bold text-[#2F5496]">פרטי רופא/ת משפחה</span>
+        </div>
+        <div className="px-3 py-2 flex items-center gap-6 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500">שם:</span>
+            <span className="font-bold text-gray-900">{patient.assignedDoctor.name}</span>
           </div>
-          <div>
-            <h3 className="text-base font-semibold text-gray-900">{patient.assignedDoctor.name}</h3>
-            <p className="text-sm text-gray-500">רופא/ת משפחה | {patient.branch.name}</p>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500">מחלקה:</span>
+            <span className="text-gray-900">רפואת משפחה</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500">סניף:</span>
+            <span className="text-gray-900">{patient.branch.name}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500">מ.ר.:</span>
+            <span className="text-gray-900 font-mono">{patient.assignedDoctor.id}</span>
           </div>
         </div>
       </div>
 
-      {/* Available slots */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 bg-blue-50">
-          <h3 className="text-base font-semibold text-blue-900">תורים פנויים</h3>
-          <p className="text-xs text-blue-600 mt-0.5">{familyDoctorSlots.length} תורים זמינים</p>
+      {/* Available slots — data grid */}
+      <div className="border border-gray-400 bg-white overflow-hidden">
+        <div className="bg-[#4472C4] px-3 py-1.5 flex items-center justify-between">
+          <span className="text-[11px] font-bold text-white">תורים פנויים</span>
+          <span className="text-[10px] text-blue-200">{familyDoctorSlots.length} רשומות</span>
         </div>
 
-        <div className="divide-y divide-gray-50">
-          {familyDoctorSlots.map((slot) => (
-            <button
-              key={slot.id}
-              onClick={() => setSelectedSlotId(slot.id)}
-              className={`
-                w-full px-5 py-3.5 flex items-center justify-between text-right transition-all
-                ${selectedSlotId === slot.id
-                  ? 'bg-blue-50 border-r-4 border-blue-500'
-                  : 'hover:bg-gray-50'
-                }
-              `}
-            >
-              <div className="flex items-center gap-4">
-                <div>
-                  <div className="text-sm font-medium text-gray-900">{formatDate(slot.time)}</div>
-                  <div className="text-xs text-gray-500">
-                    {new Date(slot.time).toLocaleDateString('he-IL', { weekday: 'long' })}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">{slot.type}</span>
-                <span className="text-sm font-semibold text-blue-600">{formatTime(slot.time)}</span>
-              </div>
-            </button>
-          ))}
-        </div>
+        <table className="w-full border-collapse text-xs">
+          <thead>
+            <tr className="bg-[#d6dce4]">
+              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700 w-8">#</th>
+              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">יום</th>
+              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">תאריך</th>
+              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">שעה</th>
+              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">סוג ביקור</th>
+            </tr>
+          </thead>
+          <tbody>
+            {familyDoctorSlots.map((slot, i) => (
+              <tr
+                key={slot.id}
+                onClick={() => setSelectedSlotId(slot.id)}
+                className={`cursor-pointer transition-colors ${
+                  selectedSlotId === slot.id
+                    ? 'bg-[#cce0ff] border-r-2 border-r-[#4472C4]'
+                    : i % 2 === 0
+                    ? 'bg-white hover:bg-[#e8f0ff]'
+                    : 'bg-[#f5f7fa] hover:bg-[#e8f0ff]'
+                }`}
+              >
+                <td className="px-2 py-1.5 border border-gray-300 text-gray-400 text-center">{i + 1}</td>
+                <td className="px-2 py-1.5 border border-gray-300 text-gray-700">
+                  {new Date(slot.time).toLocaleDateString('he-IL', { weekday: 'long' })}
+                </td>
+                <td className="px-2 py-1.5 border border-gray-300 text-gray-900 font-medium">{formatDate(slot.time)}</td>
+                <td className="px-2 py-1.5 border border-gray-300 text-[#2F5496] font-bold">{formatTime(slot.time)}</td>
+                <td className="px-2 py-1.5 border border-gray-300">
+                  <span className={`px-1.5 py-0.5 text-[10px] font-medium border ${
+                    slot.type === 'ביקור דחוף'
+                      ? 'bg-red-50 text-red-700 border-red-300'
+                      : slot.type === 'מעקב'
+                      ? 'bg-amber-50 text-amber-700 border-amber-300'
+                      : 'bg-gray-50 text-gray-600 border-gray-300'
+                  }`}>
+                    {slot.type}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-        {/* Book button */}
+        {/* Selection bar */}
         {selectedSlotId && (
-          <div className="px-5 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              נבחר: <span className="font-medium text-gray-900">
+          <div className="bg-[#e8ecf0] border-t border-gray-400 px-3 py-2 flex items-center justify-between">
+            <div className="text-[11px] text-gray-600">
+              נבחר: <span className="font-bold text-gray-900">
                 {formatDate(familyDoctorSlots.find((s) => s.id === selectedSlotId)!.time)}{' '}
                 {formatTime(familyDoctorSlots.find((s) => s.id === selectedSlotId)!.time)}
               </span>
+              {' — '}{familyDoctorSlots.find((s) => s.id === selectedSlotId)!.type}
             </div>
             <button
               onClick={handleBook}
-              className="px-8 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="px-5 py-1.5 bg-[#4472C4] text-white text-xs font-medium border border-[#2F5496] hover:bg-[#3a64b0] transition-colors"
             >
               קביעת תור
             </button>
           </div>
         )}
       </div>
+
+      <BossaStatusBar branchName={patient.branch.name} />
     </div>
   );
 }
