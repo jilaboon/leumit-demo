@@ -1,11 +1,13 @@
 'use client';
 
-import { use, useState, useMemo } from 'react';
+import { use, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
+import { useToast } from '@/components/Toast';
 import Badge from '@/components/Badge';
 import EmptyState from '@/components/EmptyState';
 import { formatDate } from '@/lib/utils';
+import { Referral } from '@/types';
 
 export default function ReferralsPage({
   params,
@@ -15,8 +17,33 @@ export default function ReferralsPage({
   const { patientId } = use(params);
   const router = useRouter();
   const store = useStore();
+  const { showToast } = useToast();
 
   const patient = store.getPatient(patientId);
+
+  const handleReferralClick = useCallback((ref: Referral) => {
+    if (ref.status !== 'Open') return;
+    const code = ref.examCode;
+    const base = `/patient/${patientId}/appointments`;
+
+    if (code.startsWith('US-')) {
+      router.push(`${base}/qf/ultrasound/book?prefill=${code}`);
+    } else if (code.startsWith('CRD-') || code.startsWith('ECG-')) {
+      router.push(`${base}/s400/consultant?specialty=קרדיולוגיה`);
+    } else if (code.startsWith('PHY-')) {
+      router.push(`${base}/s400/institutes?search=פיזיותרפיה`);
+    } else if (code.startsWith('BLD-')) {
+      router.push(`${base}/s400/institutes?search=בדיקות+דם`);
+    } else if (code.startsWith('GYN-')) {
+      router.push(`${base}/s400/consultant?specialty=גינקולוגיה`);
+    } else if (code.startsWith('EYE-')) {
+      router.push(`${base}/s400/consultant?specialty=עיניים`);
+    } else if (code.startsWith('SOC-') || code.startsWith('FIT-')) {
+      showToast('שירות זה אינו זמין לזימון אונליין', 'warning');
+    } else {
+      showToast('שירות זה אינו זמין לזימון אונליין', 'warning');
+    }
+  }, [patientId, router, showToast]);
 
   // Date range: default 1 year back
   const today = new Date();
@@ -193,21 +220,38 @@ export default function ReferralsPage({
                   <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">מספר הפנייה</th>
                   <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">תאריך</th>
                   <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">סטטוס</th>
+                  <th className="py-3 px-4 w-10"></th>
                 </tr>
               </thead>
               <tbody>
-                {filteredReferrals.map((ref) => (
-                  <tr key={ref.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4 font-mono text-xs text-gray-600" dir="ltr">{ref.examCode}</td>
-                    <td className="py-3 px-4 font-medium text-gray-900">{ref.examName}</td>
-                    <td className="py-3 px-4 text-gray-700">{ref.referringDoctor}</td>
-                    <td className="py-3 px-4 font-mono text-xs text-gray-600" dir="ltr">{ref.referralNumber}</td>
-                    <td className="py-3 px-4 text-gray-700">{formatDate(ref.createdISO)}</td>
-                    <td className="py-3 px-4">
-                      <Badge status={ref.status} label={statusLabel(ref.status)} />
-                    </td>
-                  </tr>
-                ))}
+                {filteredReferrals.map((ref) => {
+                  const isOpen = ref.status === 'Open';
+                  return (
+                    <tr
+                      key={ref.id}
+                      onClick={isOpen ? () => handleReferralClick(ref) : undefined}
+                      className={`border-b border-gray-50 transition-colors ${
+                        isOpen
+                          ? 'cursor-pointer hover:bg-teal-50/50'
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <td className="py-3 px-4 font-mono text-xs text-gray-600" dir="ltr">{ref.examCode}</td>
+                      <td className="py-3 px-4 font-medium text-gray-900">{ref.examName}</td>
+                      <td className="py-3 px-4 text-gray-700">{ref.referringDoctor}</td>
+                      <td className="py-3 px-4 font-mono text-xs text-gray-600" dir="ltr">{ref.referralNumber}</td>
+                      <td className="py-3 px-4 text-gray-700">{formatDate(ref.createdISO)}</td>
+                      <td className="py-3 px-4">
+                        <Badge status={ref.status} label={statusLabel(ref.status)} />
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        {isOpen && (
+                          <span className="text-teal-500 text-sm">←</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

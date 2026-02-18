@@ -1,7 +1,7 @@
 'use client';
 
-import { use, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { use, useState, useMemo, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import EmptyState from '@/components/EmptyState';
 import { formatDate, formatTime } from '@/lib/utils';
@@ -30,8 +30,21 @@ export default function BookPage({
 }: {
   params: Promise<{ patientId: string }>;
 }) {
+  return (
+    <Suspense>
+      <BookPageInner params={params} />
+    </Suspense>
+  );
+}
+
+function BookPageInner({
+  params,
+}: {
+  params: Promise<{ patientId: string }>;
+}) {
   const { patientId } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const store = useStore();
 
   const [searchMode, setSearchMode] = useState<SearchMode>('code');
@@ -48,6 +61,28 @@ export default function BookPage({
   const [filterHours, setFilterHours] = useState<string[]>([]);
 
   const patient = store.getPatient(patientId);
+
+  // Pre-fill from query param (e.g., from referrals page)
+  const prefill = searchParams.get('prefill');
+  useEffect(() => {
+    if (!prefill || !patient) return;
+    const isCode = /^[A-Z]+-\d+$/i.test(prefill);
+    const mode: SearchMode = isCode ? 'code' : 'text';
+    setSearchMode(mode);
+    setQuery(prefill);
+    // Search directly with the prefill value to avoid stale state
+    const found = store.searchSlots(prefill, isCode ? 'code' : 'text');
+    setRawResults(found);
+    setSearchedQuery(prefill);
+    setHasSearched(true);
+    setSelectedSlot(null);
+    setMaxDistance(15);
+    setFilterCity('');
+    setFilterDays([]);
+    setFilterHours([]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefill]);
+
   if (!patient) return null;
 
   const handleSearch = () => {

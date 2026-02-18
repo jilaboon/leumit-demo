@@ -1,14 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const store = useStore();
   const router = useRouter();
+  const pathname = usePathname();
   const { showToast } = useToast();
+
+  // CRM routes render their own shell
+  if (pathname.startsWith('/crm')) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

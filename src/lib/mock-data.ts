@@ -162,3 +162,65 @@ export const ultrasoundExamTypes = [
   { code: 'US-501', name: 'אולטרסאונד כליות' },
   { code: 'US-601', name: 'אולטרסאונד דופלר' },
 ];
+
+// ─── S400 Mock Data ───
+
+// Family doctor available slots
+export const familyDoctorSlots = [
+  { id: 'FD-001', time: daysFromNowAt(1, 8, 30), type: 'ביקור רגיל' },
+  { id: 'FD-002', time: daysFromNowAt(1, 10, 0), type: 'ביקור רגיל' },
+  { id: 'FD-003', time: daysFromNowAt(2, 9, 0), type: 'מעקב' },
+  { id: 'FD-004', time: daysFromNowAt(2, 14, 30), type: 'ביקור רגיל' },
+  { id: 'FD-005', time: daysFromNowAt(3, 11, 0), type: 'ביקור דחוף' },
+  { id: 'FD-006', time: daysFromNowAt(4, 8, 0), type: 'ביקור רגיל' },
+];
+
+// Consultant specialties
+export const consultantSpecialties = [
+  { id: 'surgery', name: 'כירורגיה', subSpecialties: ['כירורגיה כללית', 'כירורגיית כלי דם'] },
+  { id: 'neurology', name: 'נוירולוגיה', subSpecialties: ['נוירולוגיה כללית', 'נוירולוגיה ילדים'] },
+  { id: 'cardiology', name: 'קרדיולוגיה', subSpecialties: ['קרדיולוגיה כללית', 'אלקטרופיזיולוגיה'] },
+  { id: 'ent', name: 'אף אוזן גרון', subSpecialties: ['כללי', 'אלרגולוגיה'] },
+  { id: 'ophthalmology', name: 'עיניים', subSpecialties: ['עיניים כללי', 'רשתית'] },
+  { id: 'dermatology', name: 'עור', subSpecialties: ['עור כללי', 'עור קוסמטי'] },
+  { id: 'orthopedics', name: 'אורתופדיה', subSpecialties: ['אורתופדיה כללית', 'ספורט'] },
+  { id: 'gastro', name: 'גסטרואנטרולוגיה', subSpecialties: ['גסטרו כללי', 'כבד'] },
+];
+
+// Mock consultant slots
+export const consultantSlots = [
+  { id: 'CS-001', doctorName: 'ד"ר יעקב גולדברג', specialty: 'קרדיולוגיה', subSpecialty: 'קרדיולוגיה כללית', clinic: clinics.ramatAviv, startISO: daysFromNowAt(3, 10, 0) },
+  { id: 'CS-002', doctorName: 'ד"ר סמדר ביטון', specialty: 'נוירולוגיה', subSpecialty: 'נוירולוגיה כללית', clinic: clinics.petahTikva, startISO: daysFromNowAt(4, 14, 30) },
+  { id: 'CS-003', doctorName: 'ד"ר אמיר חסון', specialty: 'אורתופדיה', subSpecialty: 'אורתופדיה כללית', clinic: clinics.herzliya, startISO: daysFromNowAt(2, 9, 0) },
+  { id: 'CS-004', doctorName: 'ד"ר רונית שפירא', specialty: 'עיניים', subSpecialty: 'עיניים כללי', clinic: clinics.ramatAviv, startISO: daysFromNowAt(5, 11, 30) },
+  { id: 'CS-005', doctorName: 'ד"ר משה דהן', specialty: 'עור', subSpecialty: 'עור כללי', clinic: clinics.petahTikva, startISO: daysFromNowAt(6, 8, 0) },
+  { id: 'CS-006', doctorName: 'ד"ר טלי ורדי', specialty: 'גסטרואנטרולוגיה', subSpecialty: 'גסטרו כללי', clinic: clinics.ramatAviv, startISO: daysFromNowAt(3, 15, 0) },
+  { id: 'CS-007', doctorName: 'ד"ר עופר נחום', specialty: 'כירורגיה', subSpecialty: 'כירורגיה כללית', clinic: clinics.herzliya, startISO: daysFromNowAt(7, 10, 0) },
+  { id: 'CS-008', doctorName: 'ד"ר לימור אלון', specialty: 'אף אוזן גרון', subSpecialty: 'כללי', clinic: clinics.petahTikva, startISO: daysFromNowAt(4, 9, 30) },
+  { id: 'CS-009', doctorName: 'ד"ר יעקב גולדברג', specialty: 'קרדיולוגיה', subSpecialty: 'אלקטרופיזיולוגיה', clinic: clinics.herzliya, startISO: daysFromNowAt(8, 13, 0) },
+  { id: 'CS-010', doctorName: 'ד"ר אמיר חסון', specialty: 'אורתופדיה', subSpecialty: 'ספורט', clinic: clinics.ramatAviv, startISO: daysFromNowAt(5, 16, 0) },
+];
+
+// Institute types
+export const instituteTypes = [
+  { id: 'xray', name: 'רנטגן', code: 'XR-100' },
+  { id: 'holter', name: 'הולטר', code: 'HLT-200' },
+  { id: 'pregnancy', name: 'מעקב הריון', code: 'PRG-300' },
+  { id: 'hearing', name: 'בדיקת שמיעה', code: 'AUD-400' },
+  { id: 'physio', name: 'פיזיותרפיה', code: 'PHY-500' },
+  { id: 'stress', name: 'בדיקת מאמץ', code: 'STR-600' },
+];
+
+// Mock institute slots
+export const instituteSlots = [
+  { id: 'IS-001', instituteName: 'רנטגן', code: 'XR-100', clinic: clinics.ramatAviv, startISO: daysFromNowAt(1, 8, 0), providerName: 'צוות רנטגן' },
+  { id: 'IS-002', instituteName: 'רנטגן', code: 'XR-100', clinic: clinics.herzliya, startISO: daysFromNowAt(2, 10, 30), providerName: 'צוות רנטגן' },
+  { id: 'IS-003', instituteName: 'הולטר', code: 'HLT-200', clinic: clinics.petahTikva, startISO: daysFromNowAt(3, 9, 0), providerName: 'מעבדת הולטר' },
+  { id: 'IS-004', instituteName: 'הולטר', code: 'HLT-200', clinic: clinics.ramatAviv, startISO: daysFromNowAt(5, 11, 0), providerName: 'מעבדת הולטר' },
+  { id: 'IS-005', instituteName: 'מעקב הריון', code: 'PRG-300', clinic: clinics.ramatAviv, startISO: daysFromNowAt(2, 14, 0), providerName: 'ד"ר שירה כץ' },
+  { id: 'IS-006', instituteName: 'בדיקת שמיעה', code: 'AUD-400', clinic: clinics.herzliya, startISO: daysFromNowAt(4, 8, 30), providerName: 'מכון שמיעה' },
+  { id: 'IS-007', instituteName: 'פיזיותרפיה', code: 'PHY-500', clinic: clinics.ramatAviv, startISO: daysFromNowAt(1, 16, 0), providerName: 'מכון פיזיותרפיה' },
+  { id: 'IS-008', instituteName: 'פיזיותרפיה', code: 'PHY-500', clinic: clinics.petahTikva, startISO: daysFromNowAt(3, 10, 0), providerName: 'מכון פיזיותרפיה' },
+  { id: 'IS-009', instituteName: 'בדיקת מאמץ', code: 'STR-600', clinic: clinics.herzliya, startISO: daysFromNowAt(6, 9, 0), providerName: 'מעבדת מאמץ' },
+  { id: 'IS-010', instituteName: 'בדיקת מאמץ', code: 'STR-600', clinic: clinics.ramatAviv, startISO: daysFromNowAt(8, 13, 30), providerName: 'מעבדת מאמץ' },
+];

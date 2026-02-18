@@ -19,10 +19,10 @@ interface ServiceConfig {
 
 const SERVICES: ServiceConfig[] = [
   { id: 'ultrasound', category: 'Ultrasound', title: 'אולטרסאונד', subtitle: 'בדיקות דימות אולטרסאונד', icon: '📡', href: '/appointments/qf/ultrasound/book', isDemo: true },
-  { id: 'family', category: 'Family', title: 'רפואה ראשונית', subtitle: 'ייעוץ, מעקב, חיסונים', icon: '👨‍👩‍👧‍👦', href: '/appointments/s400?family', isDemo: false },
-  { id: 'consultant', category: 'Consultant', title: 'רפואה יועצת', subtitle: 'ייעוץ מומחים', icon: '🩺', href: '/appointments/s400?consultant', isDemo: false },
-  { id: 'institutes', category: 'Institutes', title: 'מכונים', subtitle: 'מעבדות ומכונים', icon: '🏥', href: '/appointments/s400?institutes', isDemo: false },
-  { id: 'complementary', category: 'Complementary', title: 'רפואה משלימה', subtitle: 'דיקור, נטורופתיה', icon: '🌿', href: '/appointments/s400?complementary', isDemo: false },
+  { id: 'family', category: 'Family', title: 'רפואה ראשונית', subtitle: 'ייעוץ, מעקב, חיסונים', icon: '👨‍👩‍👧‍👦', href: '/appointments/s400/family', isDemo: true },
+  { id: 'consultant', category: 'Consultant', title: 'רפואה יועצת', subtitle: 'ייעוץ מומחים', icon: '🩺', href: '/appointments/s400/consultant', isDemo: true },
+  { id: 'institutes', category: 'Institutes', title: 'מכונים', subtitle: 'מעבדות ומכונים', icon: '🏥', href: '/appointments/s400/institutes', isDemo: true },
+  { id: 'complementary', category: 'Complementary', title: 'רפואה משלימה', subtitle: 'דיקור, נטורופתיה', icon: '🌿', href: '/appointments/s400/complementary', isDemo: true },
 ];
 
 export default function AppointmentsCenterPage({
@@ -79,10 +79,12 @@ export default function AppointmentsCenterPage({
               label: 'תור אחרון',
               value: lastApt ? formatDate(lastApt.startISO) : 'אין',
             },
-            ...(svc.isDemo
+            ...(svc.id === 'ultrasound'
               ? [{ label: 'זמן המתנה משוער', value: '3-7 ימים' }]
               : []),
           ];
+
+          const isQF = svc.id === 'ultrasound';
 
           return (
             <ServiceCard
@@ -90,17 +92,16 @@ export default function AppointmentsCenterPage({
               title={svc.title}
               subtitle={svc.subtitle}
               icon={svc.icon}
-              highlighted={svc.isDemo}
+              highlighted={isQF}
               statusBadge={
-                svc.isDemo
-                  ? { label: 'זמין', variant: 'available' }
-                  : { label: 'S400', variant: 'disabled' }
+                isQF
+                  ? { label: 'QF', variant: 'available' }
+                  : { label: 'S400', variant: 'limited' }
               }
               contextRows={contextRows}
               primaryAction={{
                 label: 'זימון תור',
                 href: `/patient/${patientId}${svc.href}`,
-                disabled: !svc.isDemo,
               }}
             />
           );

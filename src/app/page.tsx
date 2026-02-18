@@ -28,7 +28,7 @@ export default function LandingPage() {
 
     const patient = store.getPatient(trimmed);
     if (patient) {
-      router.push(`/patient/${patient.id}/appointments`);
+      router.push(`/crm/${patient.id}`);
     } else {
       setError('מטופל לא נמצא. נסה שוב.');
       setLoading(false);

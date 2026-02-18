@@ -96,6 +96,12 @@ export default function SuccessPage({
       {/* Actions */}
       <div className="flex items-center justify-center gap-4">
         <button
+          onClick={() => router.push(`/crm/${patientId}`)}
+          className="px-6 py-2.5 text-gray-600 bg-white border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
+        >
+          חזרה ל-CRM
+        </button>
+        <button
           onClick={() => router.push(`/patient/${patientId}/appointments/qf/ultrasound/book`)}
           className="px-6 py-2.5 text-teal-700 bg-teal-50 border border-teal-200 rounded-xl text-sm font-medium hover:bg-teal-100 transition-colors"
         >
