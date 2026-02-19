@@ -1,18 +1,14 @@
 'use client';
 
-import { use, useState, useMemo, useRef, useEffect } from 'react';
+import { use, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
-import { instituteTypes } from '@/lib/mock-data';
+import { institutes, Institute, InstituteService } from '@/lib/mock-data';
 
-// All searchable services — includes both QF and S400 services
-const allServices = [
-  ...instituteTypes.map((t) => ({ ...t, system: 's400' as const })),
-  { id: 'ultrasound', name: 'אולטרסאונד', code: 'US-700', system: 'qf' as const },
-  { id: 'ultrasound-gyn', name: 'אולטרסאונד גינקולוגי', code: 'US-701', system: 'qf' as const },
-  { id: 'ultrasound-abd', name: 'אולטרסאונד בטן', code: 'US-702', system: 'qf' as const },
-  { id: 'ultrasound-preg', name: 'אולטרסאונד הריון', code: 'US-703', system: 'qf' as const },
-];
+// Build a flat list of all services for smart search
+const allServices = institutes.flatMap((inst) =>
+  inst.services.map((svc) => ({ ...svc, instituteName: inst.name, instituteId: inst.id }))
+);
 
 export default function InstitutesSearchPage({
   params,
@@ -24,86 +20,67 @@ export default function InstitutesSearchPage({
   const store = useStore();
   const patient = store.getPatient(patientId);
 
-  const [query, setQuery] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-
-  const suggestions = useMemo(() => {
-    if (!query.trim()) return allServices;
-    const q = query.trim();
-    return allServices.filter(
-      (s) =>
-        s.name.includes(q) ||
-        s.code.toLowerCase().includes(q.toLowerCase())
-    );
-  }, [query]);
-
-  // Reset selection when suggestions change
-  useEffect(() => {
-    setSelectedIndex(-1);
-  }, [suggestions]);
+  const [selectedInstituteId, setSelectedInstituteId] = useState('');
+  const [selectedServiceId, setSelectedServiceId] = useState('');
+  const [serviceFilter, setServiceFilter] = useState('');
+  const [smartQuery, setSmartQuery] = useState('');
+  const [showSmartResults, setShowSmartResults] = useState(false);
+  const smartRef = useRef<HTMLInputElement>(null);
 
   if (!patient) return null;
 
-  const navigateToService = (service: typeof allServices[0]) => {
-    setShowSuggestions(false);
+  // Current institute and its services
+  const currentInstitute = institutes.find((i) => i.id === selectedInstituteId);
+  const filteredServices = useMemo(() => {
+    if (!currentInstitute) return [];
+    if (!serviceFilter.trim()) return currentInstitute.services;
+    const q = serviceFilter.trim();
+    return currentInstitute.services.filter(
+      (s) => s.name.includes(q) || s.code.toLowerCase().includes(q.toLowerCase())
+    );
+  }, [currentInstitute, serviceFilter]);
+
+  const selectedService = currentInstitute?.services.find((s) => s.id === selectedServiceId);
+
+  // Smart search results
+  const smartResults = useMemo(() => {
+    if (!smartQuery.trim()) return [];
+    const q = smartQuery.trim();
+    return allServices.filter(
+      (s) =>
+        s.name.includes(q) ||
+        s.code.toLowerCase().includes(q.toLowerCase()) ||
+        s.instituteName.includes(q)
+    );
+  }, [smartQuery]);
+
+  const navigateToService = (service: InstituteService) => {
+    if (!service.available) return;
     if (service.system === 'qf') {
-      // QF-supported → go to QF ultrasound booking with pre-fill
       router.push(
         `/patient/${patientId}/appointments/qf/ultrasound/book?prefill=${encodeURIComponent(service.name)}`
       );
     } else {
-      // Legacy → go to S400 Bossa Nova institutes
       router.push(
         `/patient/${patientId}/appointments/s400/institutes?search=${encodeURIComponent(service.name)}`
       );
     }
   };
 
-  const handleSearch = () => {
-    if (!query.trim()) return;
-    // Check if query matches a QF service
-    const isUltrasound =
-      query.includes('אולטרסאונד') ||
-      query.includes('אולטראסאונד') ||
-      query.includes('על-קול') ||
-      query.includes('על קול');
-
-    if (isUltrasound) {
-      router.push(
-        `/patient/${patientId}/appointments/qf/ultrasound/book?prefill=${encodeURIComponent(query)}`
-      );
-    } else {
-      router.push(
-        `/patient/${patientId}/appointments/s400/institutes?search=${encodeURIComponent(query)}`
-      );
-    }
+  const handleSmartSelect = (result: typeof allServices[0]) => {
+    setShowSmartResults(false);
+    setSmartQuery('');
+    // Auto-populate both fields
+    setSelectedInstituteId(result.instituteId);
+    setSelectedServiceId(result.id);
+    setServiceFilter('');
+    // Navigate directly
+    navigateToService(result);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showSuggestions || suggestions.length === 0) {
-      if (e.key === 'Enter') handleSearch();
-      return;
-    }
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedIndex((prev) => Math.max(prev - 1, -1));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (selectedIndex >= 0) {
-        navigateToService(suggestions[selectedIndex]);
-      } else {
-        handleSearch();
-      }
-    } else if (e.key === 'Escape') {
-      setShowSuggestions(false);
-    }
+  const handleSearch = () => {
+    if (!selectedService) return;
+    navigateToService(selectedService);
   };
 
   return (
@@ -121,116 +98,183 @@ export default function InstitutesSearchPage({
       </div>
 
       <h2 className="text-xl font-bold text-gray-900 mb-2">חיפוש מכונים ובדיקות</h2>
-      <p className="text-sm text-gray-500 mb-6">הקלד שם בדיקה או מכון — המערכת תנתב אותך למסך המתאים</p>
+      <p className="text-sm text-gray-500 mb-6">בחר מכון ושירות לקביעת תור</p>
 
-      {/* Search */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">חיפוש בדיקה / מכון</label>
+      {/* Smart search (optional shortcut) */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">חיפוש חכם</label>
         <div className="relative">
-          <div className="flex gap-3">
-            <input
-              ref={inputRef}
-              type="text"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setShowSuggestions(true);
-              }}
-              onFocus={() => setShowSuggestions(true)}
-              onKeyDown={handleKeyDown}
-              placeholder='הקלד שם בדיקה — לדוגמה: "רנטגן", "הולטר", "אולטרסאונד"...'
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-              autoFocus
-            />
-            <button
-              onClick={handleSearch}
-              className="px-6 py-3 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 transition-colors"
-            >
-              חיפוש
-            </button>
-          </div>
+          <input
+            ref={smartRef}
+            type="text"
+            value={smartQuery}
+            onChange={(e) => {
+              setSmartQuery(e.target.value);
+              setShowSmartResults(true);
+            }}
+            onFocus={() => smartQuery.trim() && setShowSmartResults(true)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') setShowSmartResults(false);
+            }}
+            placeholder='הקלד שם שירות — לדוגמה: "דם", "אולטרסאונד", "הולטר"...'
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+          />
 
-          {/* Autocomplete dropdown */}
-          {showSuggestions && suggestions.length > 0 && (
-            <div
-              ref={listRef}
-              className="absolute z-20 top-full mt-1 left-0 right-14 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-80 overflow-y-auto"
-            >
-              {suggestions.map((svc, i) => {
-                const isQF = svc.system === 'qf';
-                return (
-                  <button
-                    key={svc.id}
-                    onClick={() => navigateToService(svc)}
-                    className={`
-                      w-full px-4 py-3 flex items-center justify-between text-right transition-colors
-                      ${i === selectedIndex ? (isQF ? 'bg-teal-50' : 'bg-blue-50') : 'hover:bg-gray-50'}
-                      ${i > 0 ? 'border-t border-gray-50' : ''}
-                    `}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
-                        isQF ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        {isQF ? 'QF' : 'S4'}
-                      </span>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{svc.name}</div>
-                        <div className="text-xs text-gray-400">{svc.code}</div>
-                      </div>
+          {/* Smart search results */}
+          {showSmartResults && smartResults.length > 0 && (
+            <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-64 overflow-y-auto">
+              {smartResults.map((result) => (
+                <button
+                  key={result.id}
+                  onClick={() => handleSmartSelect(result)}
+                  disabled={!result.available}
+                  className={`
+                    w-full px-4 py-3 flex items-center justify-between text-right transition-colors border-b border-gray-50 last:border-b-0
+                    ${result.available ? 'hover:bg-gray-50' : 'opacity-50 cursor-not-allowed'}
+                  `}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold ${
+                      result.system === 'qf' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {result.system === 'qf' ? 'QF' : 'S4'}
+                    </span>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{result.name}</div>
+                      <div className="text-xs text-gray-400">{result.instituteName} &middot; {result.code}</div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {isQF && (
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">
-                          זימון מהיר
-                        </span>
-                      )}
-                      <span className="text-gray-300">&larr;</span>
-                    </div>
-                  </button>
-                );
-              })}
+                  </div>
+                  {!result.available && (
+                    <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">לא זמין</span>
+                  )}
+                </button>
+              ))}
             </div>
           )}
         </div>
-
-        <p className="text-xs text-gray-400 mt-3">
-          שירותים הזמינים בזימון מהיר (QF) יועברו ישירות למסך זימון חדש. שירותים אחרים יועברו למערכת הקיימת.
-        </p>
+        <p className="text-[11px] text-gray-400 mt-1.5">קיצור דרך — הקלד שם שירות והמערכת תמלא את השדות אוטומטית</p>
       </div>
 
-      {/* Quick access tiles */}
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">גישה מהירה</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {allServices.map((svc) => {
-            const isQF = svc.system === 'qf';
-            // Only show one ultrasound tile
-            if (svc.id.startsWith('ultrasound-')) return null;
-            return (
-              <button
-                key={svc.id}
-                onClick={() => navigateToService(svc)}
-                className={`
-                  p-4 rounded-xl border text-right transition-all hover:shadow-sm
-                  ${isQF
-                    ? 'border-teal-200 bg-teal-50 hover:bg-teal-100'
-                    : 'border-gray-200 bg-white hover:bg-gray-50'
-                  }
-                `}
+      {/* Main two-field search */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          {/* Field 1: Institute */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">מכון</label>
+            <select
+              value={selectedInstituteId}
+              onChange={(e) => {
+                setSelectedInstituteId(e.target.value);
+                setSelectedServiceId('');
+                setServiceFilter('');
+              }}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white"
+            >
+              <option value="">— בחר מכון —</option>
+              {institutes.map((inst) => (
+                <option key={inst.id} value={inst.id}>
+                  {inst.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Field 2: Service (dependent) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">שירות</label>
+            {!selectedInstituteId ? (
+              <select
+                disabled
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm bg-gray-50 text-gray-400 cursor-not-allowed"
               >
-                <div className="text-sm font-medium text-gray-900">{svc.name}</div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-[10px] text-gray-400">{svc.code}</span>
-                  {isQF ? (
-                    <span className="text-[10px] font-medium text-teal-600">QF</span>
+                <option>— בחר מכון תחילה —</option>
+              </select>
+            ) : (
+              <div className="relative">
+                {/* Search within services */}
+                <input
+                  type="text"
+                  value={serviceFilter}
+                  onChange={(e) => {
+                    setServiceFilter(e.target.value);
+                    setSelectedServiceId('');
+                  }}
+                  placeholder="חיפוש שירות..."
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent mb-2"
+                />
+
+                {/* Service list */}
+                <div className="border border-gray-200 rounded-xl overflow-hidden max-h-52 overflow-y-auto">
+                  {filteredServices.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-gray-400 text-center">לא נמצאו שירותים</div>
                   ) : (
-                    <span className="text-[10px] font-medium text-gray-400">S400</span>
+                    filteredServices.map((svc) => (
+                      <button
+                        key={svc.id}
+                        onClick={() => svc.available && setSelectedServiceId(svc.id)}
+                        disabled={!svc.available}
+                        className={`
+                          w-full px-4 py-2.5 flex items-center justify-between text-right transition-colors border-b border-gray-50 last:border-b-0
+                          ${!svc.available
+                            ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
+                            : selectedServiceId === svc.id
+                            ? 'bg-teal-50 border-r-4 border-r-teal-500'
+                            : 'hover:bg-gray-50'
+                          }
+                        `}
+                      >
+                        <div>
+                          <div className={`text-sm ${svc.available ? 'text-gray-900' : 'text-gray-400'}`}>{svc.name}</div>
+                          <div className="text-xs text-gray-400">{svc.code}</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {!svc.available ? (
+                            <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">לא זמין כרגע</span>
+                          ) : svc.system === 'qf' ? (
+                            <span className="text-[10px] font-medium text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full">QF</span>
+                          ) : null}
+                          {selectedServiceId === svc.id && svc.available && (
+                            <span className="text-teal-600 text-lg">&#x2713;</span>
+                          )}
+                        </div>
+                      </button>
+                    ))
                   )}
                 </div>
-              </button>
-            );
-          })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Search button */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            {selectedService ? (
+              <>
+                נבחר: <span className="font-medium text-gray-900">{currentInstitute?.name}</span>
+                {' → '}
+                <span className="font-medium text-gray-900">{selectedService.name}</span>
+                {selectedService.system === 'qf' && (
+                  <span className="text-[10px] font-medium text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full mr-2">זימון מהיר QF</span>
+                )}
+              </>
+            ) : (
+              'בחר מכון ושירות לקביעת תור'
+            )}
+          </div>
+          <button
+            onClick={handleSearch}
+            disabled={!selectedService || !selectedService.available}
+            className={`
+              px-8 py-2.5 rounded-xl text-sm font-medium transition-colors
+              ${selectedService && selectedService.available
+                ? 'bg-teal-600 text-white hover:bg-teal-700'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }
+            `}
+          >
+            חיפוש תורים
+          </button>
         </div>
       </div>
     </div>

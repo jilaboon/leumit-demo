@@ -201,7 +201,7 @@ export const consultantSlots = [
   { id: 'CS-010', doctorName: 'ד"ר אמיר חסון', specialty: 'אורתופדיה', subSpecialty: 'ספורט', clinic: clinics.ramatAviv, startISO: daysFromNowAt(5, 16, 0) },
 ];
 
-// Institute types
+// Institute types (legacy — kept for S400 page compatibility)
 export const instituteTypes = [
   { id: 'xray', name: 'רנטגן', code: 'XR-100' },
   { id: 'holter', name: 'הולטר', code: 'HLT-200' },
@@ -209,6 +209,91 @@ export const instituteTypes = [
   { id: 'hearing', name: 'בדיקת שמיעה', code: 'AUD-400' },
   { id: 'physio', name: 'פיזיותרפיה', code: 'PHY-500' },
   { id: 'stress', name: 'בדיקת מאמץ', code: 'STR-600' },
+];
+
+// ─── Institute → Service mapping (QF institutes search) ───
+export interface InstituteService {
+  id: string;
+  name: string;
+  code: string;
+  available: boolean;
+  /** 'qf' services route to QF booking; 's400' route to Bossa Nova */
+  system: 'qf' | 's400';
+}
+
+export interface Institute {
+  id: string;
+  name: string;
+  services: InstituteService[];
+}
+
+export const institutes: Institute[] = [
+  {
+    id: 'ultrasound',
+    name: 'אולטרסאונד',
+    services: [
+      { id: 'us-general', name: 'אולטרסאונד כללי', code: 'US-700', available: true, system: 'qf' },
+      { id: 'us-gyn', name: 'אולטרסאונד גינקולוגי', code: 'US-701', available: true, system: 'qf' },
+      { id: 'us-ortho', name: 'אולטרסאונד אורתופדי', code: 'US-702', available: true, system: 'qf' },
+      { id: 'us-abdomen', name: 'אולטרסאונד בטן', code: 'US-703', available: true, system: 'qf' },
+      { id: 'us-pregnancy', name: 'אולטרסאונד הריון', code: 'US-704', available: true, system: 'qf' },
+    ],
+  },
+  {
+    id: 'laboratory',
+    name: 'מעבדה',
+    services: [
+      { id: 'lab-blood', name: 'בדיקות דם', code: 'BLD-100', available: true, system: 's400' },
+      { id: 'lab-flu', name: 'חיסון שפעת', code: 'VAC-101', available: true, system: 's400' },
+      { id: 'lab-covid', name: 'חיסון קורונה', code: 'VAC-102', available: false, system: 's400' },
+      { id: 'lab-iron', name: 'עירוי ברזל', code: 'INF-103', available: true, system: 's400' },
+    ],
+  },
+  {
+    id: 'xray',
+    name: 'רנטגן',
+    services: [
+      { id: 'xr-chest', name: 'רנטגן חזה', code: 'XR-100', available: true, system: 's400' },
+      { id: 'xr-skeletal', name: 'רנטגן שלד', code: 'XR-101', available: true, system: 's400' },
+      { id: 'xr-dental', name: 'רנטגן שיניים (פנורמי)', code: 'XR-102', available: true, system: 's400' },
+    ],
+  },
+  {
+    id: 'cardiology',
+    name: 'קרדיולוגיה',
+    services: [
+      { id: 'card-holter', name: 'הולטר לב', code: 'HLT-200', available: true, system: 's400' },
+      { id: 'card-stress', name: 'בדיקת מאמץ', code: 'STR-600', available: true, system: 's400' },
+      { id: 'card-echo', name: 'אקו לב', code: 'ECH-201', available: true, system: 's400' },
+      { id: 'card-ecg', name: 'אק"ג', code: 'ECG-202', available: true, system: 's400' },
+    ],
+  },
+  {
+    id: 'physio',
+    name: 'פיזיותרפיה',
+    services: [
+      { id: 'phy-individual', name: 'טיפול פיזיותרפי פרטני', code: 'PHY-500', available: true, system: 's400' },
+      { id: 'phy-group', name: 'פיזיותרפיה קבוצתית', code: 'PHY-501', available: true, system: 's400' },
+      { id: 'phy-hydro', name: 'הידרותרפיה', code: 'PHY-502', available: false, system: 's400' },
+    ],
+  },
+  {
+    id: 'hearing',
+    name: 'שמיעה',
+    services: [
+      { id: 'aud-test', name: 'בדיקת שמיעה', code: 'AUD-400', available: true, system: 's400' },
+      { id: 'aud-tinnitus', name: 'הערכת טנטון', code: 'AUD-401', available: true, system: 's400' },
+    ],
+  },
+  {
+    id: 'pregnancy',
+    name: 'מעקב הריון',
+    services: [
+      { id: 'prg-routine', name: 'מעקב הריון שגרתי', code: 'PRG-300', available: true, system: 's400' },
+      { id: 'prg-genetic', name: 'ייעוץ גנטי להריון', code: 'PRG-301', available: true, system: 's400' },
+      { id: 'prg-gtt', name: 'עמסת סוכר (GCT/GTT)', code: 'PRG-302', available: true, system: 's400' },
+    ],
+  },
 ];
 
 // Mock institute slots
