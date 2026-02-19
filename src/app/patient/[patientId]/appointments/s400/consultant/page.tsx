@@ -100,7 +100,7 @@ function ConsultantSearchInner({
   if (booked) {
     const slot = consultantSlots.find((s) => s.id === selectedSlotId);
     return (
-      <div className="bg-black min-h-[75vh] font-mono text-[13px] p-4 rounded-sm">
+      <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm">
         {/* System header */}
         <div className="flex justify-between mb-0">
           <span className="text-white">{dateStr}  M800SMIRI</span>
@@ -146,7 +146,7 @@ function ConsultantSearchInner({
   }
 
   return (
-    <div className="bg-black min-h-[75vh] font-mono text-[13px] p-4 rounded-sm flex flex-col">
+    <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm flex flex-col">
       {/* System header */}
       <div className="flex justify-between mb-0">
         <span className="text-white">{dateStr}  M800SMIRI</span>

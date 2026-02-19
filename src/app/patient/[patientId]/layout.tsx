@@ -1,6 +1,7 @@
 'use client';
 
 import { use, useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import PatientHeaderCard from '@/components/PatientHeaderCard';
 import { SkeletonCard } from '@/components/Skeleton';
@@ -13,15 +14,28 @@ export default function PatientLayout({
   params: Promise<{ patientId: string }>;
 }) {
   const { patientId } = use(params);
+  const pathname = usePathname();
   const store = useStore();
   const [loading, setLoading] = useState(true);
 
+  const isS400 = pathname.includes('/s400');
+
   useEffect(() => {
+    if (isS400) {
+      setLoading(false);
+      return;
+    }
     const timer = setTimeout(() => setLoading(false), 700);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isS400]);
 
   const patient = store.getPatient(patientId);
+
+  // S400 pages render full-screen (no QF chrome)
+  if (isS400) {
+    if (!patient) return null;
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (

@@ -35,7 +35,7 @@ export default function FamilyDoctorPage({
   if (booked) {
     const slot = familyDoctorSlots.find((s) => s.id === selectedSlotId);
     return (
-      <div className="bg-black min-h-[75vh] font-mono text-[13px] p-4 rounded-sm">
+      <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm">
         {/* System header */}
         <div className="flex justify-between mb-1">
           <span className="text-white">{dateStr}  M800SMIRI</span>
@@ -83,7 +83,7 @@ export default function FamilyDoctorPage({
   }
 
   return (
-    <div className="bg-black min-h-[75vh] font-mono text-[13px] p-4 rounded-sm flex flex-col">
+    <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm flex flex-col">
       {/* System header */}
       <div className="flex justify-between mb-0">
         <span className="text-white">{dateStr}  M800SMIRI</span>

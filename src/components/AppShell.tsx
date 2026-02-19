@@ -11,8 +11,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { showToast } = useToast();
 
-  // CRM routes render their own shell
-  if (pathname.startsWith('/crm')) {
+  // CRM and S400 routes render their own shell
+  if (pathname.startsWith('/crm') || pathname.includes('/s400')) {
     return <>{children}</>;
   }
 
