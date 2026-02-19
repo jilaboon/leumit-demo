@@ -23,113 +23,88 @@ export default function ComplementaryMedicinePage({
 
   if (!patient) return null;
 
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  const timeStr = now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
   return (
-    <div className="animate-fade-in">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mb-3">
-        <button
-          onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
-          className="hover:text-[#4472C4] underline"
-        >
-          זימון תור חדש
-        </button>
-        <span>&laquo;</span>
-        <span className="text-gray-700 font-medium">רפואה משלימה</span>
+    <div className="bg-black min-h-[75vh] font-mono text-[13px] p-4 rounded-sm flex flex-col">
+      {/* System header */}
+      <div className="flex justify-between mb-0">
+        <span className="text-white">{dateStr}  M800SMIRI</span>
+        <span className="text-[#33ff33]">לאומית שרותי בריאות</span>
+      </div>
+      <div className="flex justify-between mb-2">
+        <span className="text-white">{timeStr}  LT2020R1</span>
+        <span className="text-[#33ff33]">רפואה משלימה</span>
       </div>
 
-      {/* Toolbar */}
-      <div className="bg-gradient-to-b from-[#e8ecf0] to-[#d4dae0] border border-gray-400 px-1.5 py-0.5 flex items-center gap-0.5 mb-3">
-        {[
-          { icon: '🖨️', label: 'הדפסה' },
-          { icon: '🔄', label: 'רענון' },
-          { icon: '❓', label: 'עזרה' },
-        ].map((btn) => (
-          <button
-            key={btn.label}
-            className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-gray-600 hover:bg-[#c8d0d8] border border-transparent hover:border-gray-400 rounded-sm transition-colors"
+      {/* Patient info bar */}
+      <div className="bg-[#ff00ff] text-black px-2 py-0.5 mb-3 flex justify-between text-[12px]">
+        <span>ת.ז: {patient.id.replace('P', '58383838')}-8  שם מטופל: {patient.firstName} {patient.lastName}</span>
+        <span>גיל: {patient.age}  ח/נ: קופה</span>
+      </div>
+
+      {/* Title */}
+      <div className="text-[#00ffff] mb-3">
+        שירותי רפואה משלימה — {services.length} שירותים
+      </div>
+
+      {/* Table header */}
+      <div className="bg-[#008080] text-black px-1 py-0.5 mb-0 text-[12px] font-bold flex">
+        <span className="w-8 text-center">#</span>
+        <span className="w-20">קוד</span>
+        <span className="w-28">שם שירות</span>
+        <span className="flex-1">תיאור</span>
+        <span className="w-16 text-center">סטטוס</span>
+      </div>
+
+      {/* Table rows */}
+      <div className="flex-1">
+        {services.map((svc, i) => (
+          <div
+            key={svc.id}
+            className="px-1 py-0.5 flex text-[12px] text-[#33ff33]"
           >
-            <span className="text-xs">{btn.icon}</span>
-            {btn.label}
-          </button>
-        ))}
-        <div className="flex-1" />
-        <span className="text-[9px] text-gray-400">F1=עזרה</span>
-      </div>
-
-      {/* Services data grid */}
-      <div className="border border-gray-400 bg-white overflow-hidden mb-3">
-        <div className="bg-[#4472C4] px-3 py-1.5 flex items-center justify-between">
-          <span className="text-[11px] font-bold text-white">שירותי רפואה משלימה</span>
-          <span className="text-[10px] text-blue-200">{services.length} שירותים</span>
-        </div>
-
-        <table className="w-full border-collapse text-xs">
-          <thead>
-            <tr className="bg-[#d6dce4]">
-              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700 w-8">#</th>
-              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700 w-20">קוד</th>
-              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">שם שירות</th>
-              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">תיאור</th>
-              <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700 w-20">סטטוס</th>
-            </tr>
-          </thead>
-          <tbody>
-            {services.map((svc, i) => (
-              <tr
-                key={svc.id}
-                className={i % 2 === 0 ? 'bg-white' : 'bg-[#f5f7fa]'}
-              >
-                <td className="px-2 py-1.5 border border-gray-300 text-gray-400 text-center">{i + 1}</td>
-                <td className="px-2 py-1.5 border border-gray-300 text-gray-600 font-mono">{svc.code}</td>
-                <td className="px-2 py-1.5 border border-gray-300 text-gray-900 font-medium">{svc.name}</td>
-                <td className="px-2 py-1.5 border border-gray-300 text-gray-600">{svc.description}</td>
-                <td className="px-2 py-1.5 border border-gray-300 text-center">
-                  <span className="px-1.5 py-0.5 text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-300">
-                    טלפוני
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Info panel */}
-      <div className="border border-gray-400 bg-[#f4f4f4]">
-        <div className="bg-gradient-to-b from-[#d0d8e8] to-[#b8c4d8] px-3 py-1.5 border-b border-gray-400">
-          <span className="text-[11px] font-bold text-[#2F5496]">הנחיות לקביעת תור</span>
-        </div>
-        <div className="px-3 py-3 text-xs text-gray-700 space-y-2">
-          <p>שירותי רפואה משלימה זמינים לזימון טלפוני בלבד.</p>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-gray-500">מוקד שירות:</span>
-              <span className="font-bold text-[#2F5496] font-mono">*2700</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-500">אזור אישי:</span>
-              <span className="font-medium text-gray-900">leumit.co.il</span>
-            </div>
+            <span className="w-8 text-center text-gray-500">{i + 1}</span>
+            <span className="w-20 text-gray-400">{svc.code}</span>
+            <span className="w-28 text-[#33ff33] font-bold">{svc.name}</span>
+            <span className="flex-1 text-[#33ff33]">{svc.description}</span>
+            <span className="w-16 text-center text-yellow-400">טלפוני</span>
           </div>
-          <p className="text-[10px] text-gray-400 border-t border-gray-300 pt-2 mt-2">
+        ))}
+      </div>
+
+      {/* Info section */}
+      <div className="mt-4 mb-2">
+        <div className="text-[#ff00ff] mb-1">הנחיות לקביעת תור:</div>
+        <div className="text-[#33ff33] text-[12px] space-y-1">
+          <div>שירותי רפואה משלימה זמינים לזימון טלפוני בלבד.</div>
+          <div>
+            <span className="text-[#ff00ff]">מוקד שירות: </span>
+            <span className="text-[#00ffff] font-bold">*2700</span>
+            <span className="text-white">  |  </span>
+            <span className="text-[#ff00ff]">אזור אישי: </span>
+            <span className="text-[#00ffff]">leumit.co.il</span>
+          </div>
+          <div className="text-gray-500 mt-2">
             לתשומת לב: שירותים אלה כפופים לתנאי התכנית המשלימה של המטופל/ת.
-          </p>
+          </div>
         </div>
       </div>
 
-      {/* Status bar */}
-      <div className="mt-4 bg-[#e0e4e8] border border-gray-400 px-3 py-1 flex items-center justify-between text-[10px] text-gray-500">
-        <div className="flex items-center gap-3">
-          <span>Bossa Nova v8.4.2</span>
-          <span className="text-gray-300">|</span>
-          <span>מודול: רפואה משלימה</span>
-          <span className="text-gray-300">|</span>
-          <span>סניף: {patient.branch.name}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-          <span>מחובר</span>
-        </div>
+      <div className="text-right text-gray-500 text-[11px] mt-2 mb-2">Bottom</div>
+
+      {/* Function keys */}
+      <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] mt-auto">
+        <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
+          <span className="text-[#ff00ff]">F1</span><span className="text-[#33ff33]">=הסבר</span>
+        </button>
+        <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
+          <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">=סיום</span>
+        </button>
+        <span><span className="text-[#ff00ff]">F5</span><span className="text-[#33ff33]">=רענון</span></span>
+        <span><span className="text-[#ff00ff]">F12</span><span className="text-[#33ff33]">=מסך קודם</span></span>
       </div>
     </div>
   );

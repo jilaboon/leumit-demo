@@ -6,47 +6,6 @@ import { useStore } from '@/lib/store';
 import { formatDate, formatTime } from '@/lib/utils';
 import { instituteTypes, instituteSlots } from '@/lib/mock-data';
 
-function BossaToolbar() {
-  return (
-    <div className="bg-gradient-to-b from-[#e8ecf0] to-[#d4dae0] border border-gray-400 px-1.5 py-0.5 flex items-center gap-0.5 mb-3">
-      {[
-        { icon: '🖨️', label: 'הדפסה' },
-        { icon: '🔄', label: 'רענון' },
-        { icon: '📋', label: 'העתקה' },
-        { icon: '❓', label: 'עזרה' },
-      ].map((btn) => (
-        <button
-          key={btn.label}
-          className="flex items-center gap-1 px-2 py-0.5 text-[10px] text-gray-600 hover:bg-[#c8d0d8] border border-transparent hover:border-gray-400 rounded-sm transition-colors"
-        >
-          <span className="text-xs">{btn.icon}</span>
-          {btn.label}
-        </button>
-      ))}
-      <div className="flex-1" />
-      <span className="text-[9px] text-gray-400">F1=עזרה | F5=רענון</span>
-    </div>
-  );
-}
-
-function BossaStatusBar({ branchName }: { branchName: string }) {
-  return (
-    <div className="mt-4 bg-[#e0e4e8] border border-gray-400 px-3 py-1 flex items-center justify-between text-[10px] text-gray-500">
-      <div className="flex items-center gap-3">
-        <span>Bossa Nova v8.4.2</span>
-        <span className="text-gray-300">|</span>
-        <span>מודול: מכונים</span>
-        <span className="text-gray-300">|</span>
-        <span>סניף: {branchName}</span>
-      </div>
-      <div className="flex items-center gap-1">
-        <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-        <span>מחובר</span>
-      </div>
-    </div>
-  );
-}
-
 export default function InstitutesSearchPage({
   params,
 }: {
@@ -87,6 +46,10 @@ function InstitutesSearchInner({
   }, [prefillSearch]);
 
   if (!patient) return null;
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  const timeStr = now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   const suggestions = useMemo(() => {
     if (!query.trim()) return instituteTypes;
@@ -140,201 +103,208 @@ function InstitutesSearchInner({
   if (booked) {
     const slot = instituteSlots.find((s) => s.id === selectedSlotId);
     return (
-      <div className="animate-fade-in">
-        <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mb-3">
-          <button
-            onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
-            className="hover:text-[#4472C4] underline"
-          >
-            זימון תור חדש
+      <div className="bg-black min-h-[75vh] font-mono text-[13px] p-4 rounded-sm">
+        {/* System header */}
+        <div className="flex justify-between mb-0">
+          <span className="text-white">{dateStr}  M800SMIRI</span>
+          <span className="text-[#33ff33]">לאומית שרותי בריאות</span>
+        </div>
+        <div className="flex justify-between mb-3">
+          <span className="text-white">{timeStr}  LEU201R1</span>
+          <span className="text-[#33ff33]">זימון תור לבדיקה — תצוגת מכונים</span>
+        </div>
+
+        <div className="my-8">
+          <div className="text-[#33ff33] text-center mb-4">
+            *** פעולה הושלמה בהצלחה ***
+          </div>
+          {slot && (
+            <>
+              <div className="text-[#33ff33] text-center mb-2">
+                תור ל{slot.instituteName} נקבע בהצלחה
+              </div>
+              <div className="text-[#00ffff] text-center mb-2">
+                תאריך: {formatDate(slot.startISO)}  שעה: {formatTime(slot.startISO)}  מרפאה: {slot.clinic.name}
+              </div>
+            </>
+          )}
+          <div className="text-white text-center mb-6">
+            מספר אסמכתא: BN-{Date.now().toString().slice(-6)}
+          </div>
+          <div className="text-[#ff00ff] text-center">
+            הקש Enter לחזרה לתפריט ראשי
+          </div>
+        </div>
+
+        <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] mt-8">
+          <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
+            <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">=חזרה לזימון</span>
           </button>
-          <span>&laquo;</span>
-          <span className="text-gray-700 font-medium">מכונים</span>
+          <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
+            <span className="text-[#ff00ff]">Enter</span><span className="text-[#33ff33]">=המשך</span>
+          </button>
         </div>
-
-        <BossaToolbar />
-
-        <div className="border border-green-700 bg-[#e8f5e9] p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-5 h-5 bg-green-600 text-white text-xs flex items-center justify-center font-bold">V</span>
-            <h2 className="text-sm font-bold text-green-900">פעולה הושלמה — תור נקבע בהצלחה</h2>
-          </div>
-          <div className="border border-green-300 bg-white p-3 text-xs text-gray-700 leading-relaxed">
-            {slot && (
-              <>
-                <p>
-                  תור ל{slot.instituteName} נקבע בהצלחה
-                  לתאריך {formatDate(slot.startISO)} בשעה {formatTime(slot.startISO)} ב{slot.clinic.name}
-                </p>
-                <p className="mt-1 text-gray-500">מספר אסמכתא: BN-{Date.now().toString().slice(-6)}</p>
-              </>
-            )}
-          </div>
-          <div className="mt-3 flex gap-2">
-            <button
-              onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
-              className="px-4 py-1.5 bg-[#4472C4] text-white text-xs font-medium border border-[#2F5496] hover:bg-[#3a64b0] transition-colors"
-            >
-              חזרה לזימון תורים
-            </button>
-          </div>
-        </div>
-
-        <BossaStatusBar branchName={patient.branch.name} />
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mb-3">
-        <button
-          onClick={() => router.push(`/patient/${patientId}/appointments/book`)}
-          className="hover:text-[#4472C4] underline"
-        >
-          זימון תור חדש
-        </button>
-        <span>&laquo;</span>
-        <span className="text-gray-700 font-medium">מכונים</span>
+    <div className="bg-black min-h-[75vh] font-mono text-[13px] p-4 rounded-sm flex flex-col">
+      {/* System header */}
+      <div className="flex justify-between mb-0">
+        <span className="text-white">{dateStr}  M800SMIRI</span>
+        <span className="text-[#33ff33]">לאומית שרותי בריאות</span>
+      </div>
+      <div className="flex justify-between mb-2">
+        <span className="text-white">{timeStr}  LEU201R1</span>
+        <span className="text-[#33ff33]">זימון תור לבדיקה — תצוגת מכונים</span>
       </div>
 
-      <BossaToolbar />
+      {/* Patient info bar */}
+      <div className="bg-[#ff00ff] text-black px-2 py-0.5 mb-2 flex justify-between text-[12px]">
+        <span>ת.ז: {patient.id.replace('P', '58383838')}-8  שם מטופל: {patient.firstName} {patient.lastName}</span>
+        <span>גיל: {patient.age}  ח/נ: קופה</span>
+      </div>
 
-      {/* Search fieldset panel */}
-      <div className="border border-gray-400 bg-[#f4f4f4] mb-3">
-        <div className="bg-gradient-to-b from-[#d0d8e8] to-[#b8c4d8] px-3 py-1.5 border-b border-gray-400">
-          <span className="text-[11px] font-bold text-[#2F5496]">חיפוש בדיקה / מכון</span>
-        </div>
-        <div className="px-3 py-2">
+      {/* Search */}
+      <div className="mb-2">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[#ff00ff]">חיפוש לפי תאור מכון.:</span>
           <div className="relative">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setShowSuggestions(true);
-                }}
-                onFocus={() => setShowSuggestions(true)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder='הקלד שם בדיקה - לדוגמה: "רנטגן", "הולטר", "אולטרסאונד"...'
-                className="flex-1 px-2 py-1 text-xs border border-gray-400 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#4472C4]"
-              />
-              <button
-                onClick={() => handleSearch()}
-                className="px-5 py-1 bg-[#4472C4] text-white text-xs font-medium border border-[#2F5496] hover:bg-[#3a64b0] transition-colors"
-              >
-                חיפוש
-              </button>
-            </div>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-[12px] font-mono w-64 focus:outline-none focus:border-[#00ffff]"
+            />
 
             {/* Autocomplete suggestions */}
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute z-10 top-full mt-0.5 left-0 right-16 bg-white border border-gray-400 shadow-md overflow-hidden">
+              <div className="absolute z-10 top-full mt-0 left-0 w-64 bg-black border border-[#33ff33] max-h-48 overflow-y-auto">
                 {suggestions.map((type) => (
                   <button
                     key={type.id}
                     onClick={() => handleSuggestionClick(type.name)}
-                    className="w-full px-3 py-1.5 flex items-center justify-between text-right hover:bg-[#e8f0ff] transition-colors text-xs border-b border-gray-200 last:border-b-0"
+                    className="w-full px-2 py-0.5 flex items-center justify-between text-right text-[12px] text-[#33ff33] hover:bg-[#008080] hover:text-black font-mono"
                   >
-                    <span className="text-gray-900">{type.name}</span>
-                    <span className="text-[10px] text-gray-400 font-mono">{type.code}</span>
+                    <span>{type.name}</span>
+                    <span className="text-gray-500">{type.code}</span>
                   </button>
                 ))}
                 {/* Ultrasound QF option */}
                 <button
                   onClick={() => handleSuggestionClick('אולטרסאונד')}
-                  className="w-full px-3 py-1.5 flex items-center justify-between text-right hover:bg-[#e8f5f0] transition-colors text-xs border-t border-gray-300 bg-[#f0f8f4]"
+                  className="w-full px-2 py-0.5 flex items-center justify-between text-right text-[12px] text-[#00ffff] hover:bg-[#008080] hover:text-black font-mono border-t border-gray-700"
                 >
-                  <span className="text-teal-700 font-medium">אולטרסאונד</span>
-                  <span className="text-[10px] text-teal-500 font-medium">QF &larr;</span>
+                  <span>אולטרסאונד</span>
+                  <span className="text-[#00ffff]">QF &larr;</span>
                 </button>
               </div>
             )}
           </div>
         </div>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[#ff00ff]">ישוב.......:</span>
+          <span className="text-[#33ff33]">{patient.branch.name}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[#ff00ff]">שרות נלווה:</span>
+          <span className="text-[#33ff33]">+</span>
+        </div>
       </div>
 
-      {/* Results data grid */}
+      {/* Instructions */}
+      <div className="text-[#00ffff] mb-1 text-[12px]">
+        {hasSearched
+          ? `בחר מכון, הקש Enter.`
+          : 'בחר מכון, הקש Enter.'}
+      </div>
+      <div className="text-[#ff00ff] mb-2 text-[11px]">
+        1=בארה  5=רשימת זימונים למכון
+      </div>
+
+      {/* Results */}
       {hasSearched && (
-        <div className="border border-gray-400 bg-white overflow-hidden">
-          <div className="bg-[#4472C4] px-3 py-1.5 flex items-center justify-between">
-            <span className="text-[11px] font-bold text-white">תוצאות חיפוש</span>
-            <span className="text-[10px] text-blue-200">{results.length} רשומות</span>
+        <>
+          <div className="text-white text-[12px] mb-1">תאור מכון</div>
+
+          {/* Table header */}
+          <div className="bg-[#008080] text-black px-1 py-0.5 mb-0 text-[12px] font-bold flex">
+            <span className="w-44">תאור מכון</span>
+            <span className="w-16">קוד</span>
+            <span className="w-24">סניף</span>
+            <span className="w-16">אזור</span>
+            <span className="w-24">שרות נלווה</span>
+            <span className="w-24">תאריך</span>
+            <span className="w-14">שעה</span>
           </div>
 
-          {results.length === 0 ? (
-            <div className="px-3 py-6 text-center text-xs text-gray-500">
-              לא נמצאו תוצאות. נסה לחפש בדיקה אחרת.
-            </div>
-          ) : (
-            <table className="w-full border-collapse text-xs">
-              <thead>
-                <tr className="bg-[#d6dce4]">
-                  <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700 w-8">#</th>
-                  <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">בדיקה</th>
-                  <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700 w-20">קוד</th>
-                  <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">מרפאה</th>
-                  <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">יום</th>
-                  <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700">תאריך</th>
-                  <th className="text-right px-2 py-1.5 border border-gray-300 text-[11px] font-bold text-gray-700 w-16">שעה</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((slot, i) => (
-                  <tr
-                    key={slot.id}
-                    onClick={() => setSelectedSlotId(slot.id)}
-                    className={`cursor-pointer transition-colors ${
-                      selectedSlotId === slot.id
-                        ? 'bg-[#cce0ff] border-r-2 border-r-[#4472C4]'
-                        : i % 2 === 0
-                        ? 'bg-white hover:bg-[#e8f0ff]'
-                        : 'bg-[#f5f7fa] hover:bg-[#e8f0ff]'
-                    }`}
-                  >
-                    <td className="px-2 py-1.5 border border-gray-300 text-gray-400 text-center">{i + 1}</td>
-                    <td className="px-2 py-1.5 border border-gray-300 text-gray-900 font-medium">{slot.instituteName}</td>
-                    <td className="px-2 py-1.5 border border-gray-300 text-gray-600 font-mono">{slot.code}</td>
-                    <td className="px-2 py-1.5 border border-gray-300 text-gray-600">{slot.clinic.name}</td>
-                    <td className="px-2 py-1.5 border border-gray-300 text-gray-700">
-                      {new Date(slot.startISO).toLocaleDateString('he-IL', { weekday: 'short' })}
-                    </td>
-                    <td className="px-2 py-1.5 border border-gray-300 text-gray-900 font-medium">
-                      {formatDate(slot.startISO)}
-                    </td>
-                    <td className="px-2 py-1.5 border border-gray-300 text-[#2F5496] font-bold">
-                      {formatTime(slot.startISO)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-
-          {/* Selection bar */}
-          {selectedSlotId && (
-            <div className="bg-[#e8ecf0] border-t border-gray-400 px-3 py-2 flex items-center justify-between">
-              <div className="text-[11px] text-gray-600">
-                נבחר: <span className="font-bold text-gray-900">
-                  {instituteSlots.find((s) => s.id === selectedSlotId)?.instituteName} —{' '}
-                  {formatDate(instituteSlots.find((s) => s.id === selectedSlotId)!.startISO)}{' '}
-                  {formatTime(instituteSlots.find((s) => s.id === selectedSlotId)!.startISO)}
-                </span>
+          <div className="flex-1 overflow-y-auto">
+            {results.length === 0 ? (
+              <div className="text-yellow-400 py-4 text-center text-[12px]">
+                לא נמצאו תוצאות.
               </div>
-              <button
-                onClick={handleBook}
-                className="px-5 py-1.5 bg-[#4472C4] text-white text-xs font-medium border border-[#2F5496] hover:bg-[#3a64b0] transition-colors"
-              >
-                קביעת תור
-              </button>
+            ) : (
+              results.map((slot, i) => (
+                <div
+                  key={slot.id}
+                  onClick={() => setSelectedSlotId(slot.id)}
+                  className={`px-1 py-0.5 flex cursor-pointer text-[12px] ${
+                    selectedSlotId === slot.id
+                      ? 'bg-[#008080] text-black font-bold'
+                      : 'text-[#33ff33] hover:bg-gray-900'
+                  }`}
+                >
+                  <span className="w-44">{slot.instituteName}</span>
+                  <span className="w-16">{slot.code}</span>
+                  <span className="w-24">{slot.clinic.name}</span>
+                  <span className="w-16">{slot.clinic.city}</span>
+                  <span className="w-24">רחובות</span>
+                  <span className="w-24">{formatDate(slot.startISO)}</span>
+                  <span className="w-14">{formatTime(slot.startISO)}</span>
+                </div>
+              ))
+            )}
+          </div>
+
+          {selectedSlotId && (
+            <div className="mt-1 text-[#00ffff] text-[12px]">
+              נבחר: {instituteSlots.find((s) => s.id === selectedSlotId)?.instituteName} — {formatDate(instituteSlots.find((s) => s.id === selectedSlotId)!.startISO)} {formatTime(instituteSlots.find((s) => s.id === selectedSlotId)!.startISO)}
             </div>
           )}
-        </div>
+        </>
       )}
 
-      <BossaStatusBar branchName={patient.branch.name} />
+      <div className="text-right text-gray-500 text-[11px] mt-2 mb-2">Bottom</div>
+
+      {/* Function keys */}
+      <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] mt-auto">
+        <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
+          <span className="text-[#ff00ff]">F1</span><span className="text-[#33ff33]">=הסבר</span>
+        </button>
+        <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
+          <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">=סיום</span>
+        </button>
+        <span><span className="text-[#ff00ff]">F4</span><span className="text-[#33ff33]">=חלון</span></span>
+        <button onClick={() => handleSearch()} className="hover:text-white">
+          <span className="text-[#ff00ff]">F5</span><span className="text-[#33ff33]">=רענון</span>
+        </button>
+        <span><span className="text-[#ff00ff]">F7</span><span className="text-[#33ff33]">=מעבדה</span></span>
+        <span><span className="text-[#ff00ff]">F8</span><span className="text-[#33ff33]">=הפניות למכונות</span></span>
+        <span><span className="text-[#ff00ff]">F11</span><span className="text-[#33ff33]">=פרטים נוספים</span></span>
+        <span><span className="text-[#ff00ff]">F12</span><span className="text-[#33ff33]">=מסך קודם</span></span>
+        <span><span className="text-[#ff00ff]">F21</span><span className="text-[#33ff33]">=מרחב</span></span>
+        {selectedSlotId && (
+          <button onClick={handleBook} className="hover:text-white">
+            <span className="text-[#ff00ff]">Enter</span><span className="text-[#00ffff]">=קביעת תור</span>
+          </button>
+        )}
+      </div>
     </div>
   );
 }
