@@ -35,7 +35,7 @@ export default function FamilyDoctorPage({
   if (booked) {
     const slot = familyDoctorSlots.find((s) => s.id === selectedSlotId);
     return (
-      <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm">
+      <div className="bg-black min-h-screen font-mono text-base p-4 rounded-sm">
         {/* System header */}
         <div className="flex justify-between mb-1">
           <span className="text-white">{dateStr}  M800SMIRI</span>
@@ -69,7 +69,7 @@ export default function FamilyDoctorPage({
 
         {/* Function keys */}
         <div className="absolute bottom-0 left-0 right-0 p-2" style={{ position: 'relative', marginTop: 'auto' }}>
-          <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px]">
+          <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
             <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
               <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">=חזרה לזימון</span>
             </button>
@@ -83,7 +83,7 @@ export default function FamilyDoctorPage({
   }
 
   return (
-    <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm flex flex-col">
+    <div className="bg-black min-h-screen font-mono text-base p-4 rounded-sm flex flex-col">
       {/* System header */}
       <div className="flex justify-between mb-0">
         <span className="text-white">{dateStr}  M800SMIRI</span>
@@ -95,7 +95,7 @@ export default function FamilyDoctorPage({
       </div>
 
       {/* Patient info bar */}
-      <div className="bg-[#ff00ff] text-black px-2 py-0.5 mb-2 flex justify-between text-[12px]">
+      <div className="bg-[#ff00ff] text-black px-2 py-0.5 mb-2 flex justify-between text-sm">
         <span>ת.ז: {patient.id.replace('P', '58383838')}-8  שם מטופל: {patient.firstName} {patient.lastName}</span>
         <span>גיל: {patient.age}  ח/נ: קופה</span>
       </div>
@@ -116,12 +116,12 @@ export default function FamilyDoctorPage({
       <div className="text-[#00ffff] mb-1">
         בחר תור, הקש Enter.
       </div>
-      <div className="text-[#ff00ff] mb-3 text-[11px]">
+      <div className="text-[#ff00ff] mb-3 text-xs">
         1=בארה  5=רשימת זימונים  7=תחום טיפול  8=מכונים  9=מונגסי  10=הגבלויות
       </div>
 
       {/* Table header */}
-      <div className="bg-[#008080] text-black px-1 py-0.5 mb-0 text-[12px] font-bold flex">
+      <div className="bg-[#008080] text-black px-1 py-0.5 mb-0 text-sm font-bold flex">
         <span className="w-8 text-center">#</span>
         <span className="w-24">יום</span>
         <span className="w-24">תאריך</span>
@@ -136,7 +136,7 @@ export default function FamilyDoctorPage({
           <div
             key={slot.id}
             onClick={() => setSelectedSlotId(slot.id)}
-            className={`px-1 py-0.5 flex cursor-pointer text-[12px] ${
+            className={`px-1 py-0.5 flex cursor-pointer text-sm ${
               selectedSlotId === slot.id
                 ? 'bg-[#008080] text-black font-bold'
                 : 'text-[#33ff33] hover:bg-gray-900'
@@ -154,16 +154,16 @@ export default function FamilyDoctorPage({
 
       {/* Selected info */}
       {selectedSlotId && (
-        <div className="mt-2 text-[#00ffff] text-[12px]">
+        <div className="mt-2 text-[#00ffff] text-sm">
           נבחר: {patient.assignedDoctor.name} — {formatDate(familyDoctorSlots.find((s) => s.id === selectedSlotId)!.time)} {formatTime(familyDoctorSlots.find((s) => s.id === selectedSlotId)!.time)}
         </div>
       )}
 
       {/* Bottom / Status */}
-      <div className="text-right text-gray-500 text-[11px] mt-2 mb-2">Bottom</div>
+      <div className="text-right text-gray-500 text-xs mt-2 mb-2">Bottom</div>
 
       {/* Function keys */}
-      <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] mt-auto">
+      <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs mt-auto">
         <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
           <span className="text-[#ff00ff]">F1</span><span className="text-[#33ff33]">=הסבר</span>
         </button>

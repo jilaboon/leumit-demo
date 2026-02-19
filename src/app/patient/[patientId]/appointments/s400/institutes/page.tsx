@@ -103,7 +103,7 @@ function InstitutesSearchInner({
   if (booked) {
     const slot = instituteSlots.find((s) => s.id === selectedSlotId);
     return (
-      <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm">
+      <div className="bg-black min-h-screen font-mono text-base p-4 rounded-sm">
         {/* System header */}
         <div className="flex justify-between mb-0">
           <span className="text-white">{dateStr}  M800SMIRI</span>
@@ -136,7 +136,7 @@ function InstitutesSearchInner({
           </div>
         </div>
 
-        <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] mt-8">
+        <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs mt-8">
           <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
             <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">=חזרה לזימון</span>
           </button>
@@ -149,7 +149,7 @@ function InstitutesSearchInner({
   }
 
   return (
-    <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm flex flex-col">
+    <div className="bg-black min-h-screen font-mono text-base p-4 rounded-sm flex flex-col">
       {/* System header */}
       <div className="flex justify-between mb-0">
         <span className="text-white">{dateStr}  M800SMIRI</span>
@@ -161,7 +161,7 @@ function InstitutesSearchInner({
       </div>
 
       {/* Patient info bar */}
-      <div className="bg-[#ff00ff] text-black px-2 py-0.5 mb-2 flex justify-between text-[12px]">
+      <div className="bg-[#ff00ff] text-black px-2 py-0.5 mb-2 flex justify-between text-sm">
         <span>ת.ז: {patient.id.replace('P', '58383838')}-8  שם מטופל: {patient.firstName} {patient.lastName}</span>
         <span>גיל: {patient.age}  ח/נ: קופה</span>
       </div>
@@ -180,7 +180,7 @@ function InstitutesSearchInner({
               }}
               onFocus={() => setShowSuggestions(true)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-[12px] font-mono w-64 focus:outline-none focus:border-[#00ffff]"
+              className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-sm font-mono w-64 focus:outline-none focus:border-[#00ffff]"
             />
 
             {/* Autocomplete suggestions */}
@@ -190,7 +190,7 @@ function InstitutesSearchInner({
                   <button
                     key={type.id}
                     onClick={() => handleSuggestionClick(type.name)}
-                    className="w-full px-2 py-0.5 flex items-center justify-between text-right text-[12px] text-[#33ff33] hover:bg-[#008080] hover:text-black font-mono"
+                    className="w-full px-2 py-0.5 flex items-center justify-between text-right text-sm text-[#33ff33] hover:bg-[#008080] hover:text-black font-mono"
                   >
                     <span>{type.name}</span>
                     <span className="text-gray-500">{type.code}</span>
@@ -199,7 +199,7 @@ function InstitutesSearchInner({
                 {/* Ultrasound QF option */}
                 <button
                   onClick={() => handleSuggestionClick('אולטרסאונד')}
-                  className="w-full px-2 py-0.5 flex items-center justify-between text-right text-[12px] text-[#00ffff] hover:bg-[#008080] hover:text-black font-mono border-t border-gray-700"
+                  className="w-full px-2 py-0.5 flex items-center justify-between text-right text-sm text-[#00ffff] hover:bg-[#008080] hover:text-black font-mono border-t border-gray-700"
                 >
                   <span>אולטרסאונד</span>
                   <span className="text-[#00ffff]">QF &larr;</span>
@@ -219,22 +219,22 @@ function InstitutesSearchInner({
       </div>
 
       {/* Instructions */}
-      <div className="text-[#00ffff] mb-1 text-[12px]">
+      <div className="text-[#00ffff] mb-1 text-sm">
         {hasSearched
           ? `בחר מכון, הקש Enter.`
           : 'בחר מכון, הקש Enter.'}
       </div>
-      <div className="text-[#ff00ff] mb-2 text-[11px]">
+      <div className="text-[#ff00ff] mb-2 text-xs">
         1=בארה  5=רשימת זימונים למכון
       </div>
 
       {/* Results */}
       {hasSearched && (
         <>
-          <div className="text-white text-[12px] mb-1">תאור מכון</div>
+          <div className="text-white text-sm mb-1">תאור מכון</div>
 
           {/* Table header */}
-          <div className="bg-[#008080] text-black px-1 py-0.5 mb-0 text-[12px] font-bold flex">
+          <div className="bg-[#008080] text-black px-1 py-0.5 mb-0 text-sm font-bold flex">
             <span className="w-44">תאור מכון</span>
             <span className="w-16">קוד</span>
             <span className="w-24">סניף</span>
@@ -246,7 +246,7 @@ function InstitutesSearchInner({
 
           <div className="flex-1 overflow-y-auto">
             {results.length === 0 ? (
-              <div className="text-yellow-400 py-4 text-center text-[12px]">
+              <div className="text-yellow-400 py-4 text-center text-sm">
                 לא נמצאו תוצאות.
               </div>
             ) : (
@@ -254,7 +254,7 @@ function InstitutesSearchInner({
                 <div
                   key={slot.id}
                   onClick={() => setSelectedSlotId(slot.id)}
-                  className={`px-1 py-0.5 flex cursor-pointer text-[12px] ${
+                  className={`px-1 py-0.5 flex cursor-pointer text-sm ${
                     selectedSlotId === slot.id
                       ? 'bg-[#008080] text-black font-bold'
                       : 'text-[#33ff33] hover:bg-gray-900'
@@ -273,17 +273,17 @@ function InstitutesSearchInner({
           </div>
 
           {selectedSlotId && (
-            <div className="mt-1 text-[#00ffff] text-[12px]">
+            <div className="mt-1 text-[#00ffff] text-sm">
               נבחר: {instituteSlots.find((s) => s.id === selectedSlotId)?.instituteName} — {formatDate(instituteSlots.find((s) => s.id === selectedSlotId)!.startISO)} {formatTime(instituteSlots.find((s) => s.id === selectedSlotId)!.startISO)}
             </div>
           )}
         </>
       )}
 
-      <div className="text-right text-gray-500 text-[11px] mt-2 mb-2">Bottom</div>
+      <div className="text-right text-gray-500 text-xs mt-2 mb-2">Bottom</div>
 
       {/* Function keys */}
-      <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] mt-auto">
+      <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs mt-auto">
         <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
           <span className="text-[#ff00ff]">F1</span><span className="text-[#33ff33]">=הסבר</span>
         </button>

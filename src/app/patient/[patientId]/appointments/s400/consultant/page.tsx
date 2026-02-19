@@ -100,7 +100,7 @@ function ConsultantSearchInner({
   if (booked) {
     const slot = consultantSlots.find((s) => s.id === selectedSlotId);
     return (
-      <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm">
+      <div className="bg-black min-h-screen font-mono text-base p-4 rounded-sm">
         {/* System header */}
         <div className="flex justify-between mb-0">
           <span className="text-white">{dateStr}  M800SMIRI</span>
@@ -133,7 +133,7 @@ function ConsultantSearchInner({
           </div>
         </div>
 
-        <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] mt-8">
+        <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs mt-8">
           <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
             <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">=חזרה לזימון</span>
           </button>
@@ -146,7 +146,7 @@ function ConsultantSearchInner({
   }
 
   return (
-    <div className="bg-black min-h-screen font-mono text-[13px] p-4 rounded-sm flex flex-col">
+    <div className="bg-black min-h-screen font-mono text-base p-4 rounded-sm flex flex-col">
       {/* System header */}
       <div className="flex justify-between mb-0">
         <span className="text-white">{dateStr}  M800SMIRI</span>
@@ -158,7 +158,7 @@ function ConsultantSearchInner({
       </div>
 
       {/* Patient info bar */}
-      <div className="bg-[#ff00ff] text-black px-2 py-0.5 mb-3 flex justify-between text-[12px]">
+      <div className="bg-[#ff00ff] text-black px-2 py-0.5 mb-3 flex justify-between text-sm">
         <span>ת.ז: {patient.id.replace('P', '58383838')}-8  שם מטופל: {patient.firstName} {patient.lastName}</span>
         <span>גיל: {patient.age}  ח/נ: קופה</span>
       </div>
@@ -173,7 +173,7 @@ function ConsultantSearchInner({
               setSpecialty(e.target.value);
               setSubSpecialty('');
             }}
-            className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-[12px] font-mono w-48 focus:outline-none focus:border-[#00ffff]"
+            className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-sm font-mono w-48 focus:outline-none focus:border-[#00ffff]"
           >
             <option value="">— בחר —</option>
             {consultantSpecialties.map((s) => (
@@ -186,7 +186,7 @@ function ConsultantSearchInner({
             value={subSpecialty}
             onChange={(e) => setSubSpecialty(e.target.value)}
             disabled={currentSubSpecialties.length === 0}
-            className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-[12px] font-mono w-48 focus:outline-none focus:border-[#00ffff] disabled:text-gray-600 disabled:border-gray-600"
+            className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-sm font-mono w-48 focus:outline-none focus:border-[#00ffff] disabled:text-gray-600 disabled:border-gray-600"
           >
             <option value="">— הכל —</option>
             {currentSubSpecialties.map((sub) => (
@@ -203,7 +203,7 @@ function ConsultantSearchInner({
             onChange={(e) => setDoctorName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="הקלד שם"
-            className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-[12px] font-mono w-48 focus:outline-none focus:border-[#00ffff] placeholder:text-gray-600"
+            className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-sm font-mono w-48 focus:outline-none focus:border-[#00ffff] placeholder:text-gray-600"
           />
 
           <span className="text-[#ff00ff] w-20 mr-4">חיפוש חופשי:</span>
@@ -213,13 +213,13 @@ function ConsultantSearchInner({
             onChange={(e) => setFreeText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="מרפאה, עיר..."
-            className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-[12px] font-mono w-48 focus:outline-none focus:border-[#00ffff] placeholder:text-gray-600"
+            className="bg-black text-[#33ff33] border border-[#33ff33] px-2 py-0.5 text-sm font-mono w-48 focus:outline-none focus:border-[#00ffff] placeholder:text-gray-600"
           />
         </div>
       </div>
 
       {/* Instructions */}
-      <div className="text-[#00ffff] mb-1 text-[12px]">
+      <div className="text-[#00ffff] mb-1 text-sm">
         {hasSearched
           ? `נמצאו ${results.length} תוצאות. בחר תור, הקש Enter.`
           : 'הקש Enter לחיפוש, או F5 לרענון.'}
@@ -229,7 +229,7 @@ function ConsultantSearchInner({
       {hasSearched && (
         <>
           {/* Table header */}
-          <div className="bg-[#008080] text-black px-1 py-0.5 mb-0 text-[12px] font-bold flex">
+          <div className="bg-[#008080] text-black px-1 py-0.5 mb-0 text-sm font-bold flex">
             <span className="w-8 text-center">#</span>
             <span className="w-36">רופא</span>
             <span className="w-28">התמחות</span>
@@ -242,7 +242,7 @@ function ConsultantSearchInner({
           {/* Table rows */}
           <div className="flex-1 overflow-y-auto">
             {results.length === 0 ? (
-              <div className="text-yellow-400 py-4 text-center text-[12px]">
+              <div className="text-yellow-400 py-4 text-center text-sm">
                 לא נמצאו תוצאות. שנה פרמטרי חיפוש.
               </div>
             ) : (
@@ -250,7 +250,7 @@ function ConsultantSearchInner({
                 <div
                   key={slot.id}
                   onClick={() => setSelectedSlotId(slot.id)}
-                  className={`px-1 py-0.5 flex cursor-pointer text-[12px] ${
+                  className={`px-1 py-0.5 flex cursor-pointer text-sm ${
                     selectedSlotId === slot.id
                       ? 'bg-[#008080] text-black font-bold'
                       : 'text-[#33ff33] hover:bg-gray-900'
@@ -271,17 +271,17 @@ function ConsultantSearchInner({
           </div>
 
           {selectedSlotId && (
-            <div className="mt-1 text-[#00ffff] text-[12px]">
+            <div className="mt-1 text-[#00ffff] text-sm">
               נבחר: {consultantSlots.find((s) => s.id === selectedSlotId)?.doctorName} — {formatDate(consultantSlots.find((s) => s.id === selectedSlotId)!.startISO)} {formatTime(consultantSlots.find((s) => s.id === selectedSlotId)!.startISO)}
             </div>
           )}
         </>
       )}
 
-      <div className="text-right text-gray-500 text-[11px] mt-2 mb-2">Bottom</div>
+      <div className="text-right text-gray-500 text-xs mt-2 mb-2">Bottom</div>
 
       {/* Function keys */}
-      <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] mt-auto">
+      <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs mt-auto">
         <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
           <span className="text-[#ff00ff]">F1</span><span className="text-[#33ff33]">=הסבר</span>
         </button>
