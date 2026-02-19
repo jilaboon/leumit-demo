@@ -14,15 +14,13 @@ interface ServiceConfig {
   subtitle: string;
   icon: string;
   href: string;
-  isDemo: boolean;
+  isS400: boolean;
 }
 
 const SERVICES: ServiceConfig[] = [
-  { id: 'ultrasound', category: 'Ultrasound', title: 'אולטרסאונד', subtitle: 'בדיקות דימות אולטרסאונד', icon: '📡', href: '/appointments/qf/ultrasound/book', isDemo: true },
-  { id: 'family', category: 'Family', title: 'רפואה ראשונית', subtitle: 'ייעוץ, מעקב, חיסונים', icon: '👨‍👩‍👧‍👦', href: '/appointments/s400/family', isDemo: true },
-  { id: 'consultant', category: 'Consultant', title: 'רפואה יועצת', subtitle: 'ייעוץ מומחים', icon: '🩺', href: '/appointments/s400/consultant', isDemo: true },
-  { id: 'institutes', category: 'Institutes', title: 'מכונים', subtitle: 'מעבדות ומכונים', icon: '🏥', href: '/appointments/s400/institutes', isDemo: true },
-  { id: 'complementary', category: 'Complementary', title: 'רפואה משלימה', subtitle: 'דיקור, נטורופתיה', icon: '🌿', href: '/appointments/s400/complementary', isDemo: true },
+  { id: 'family', category: 'Family', title: 'רפואה ראשונית', subtitle: 'ייעוץ, מעקב, חיסונים', icon: '👨‍👩‍👧‍👦', href: '/appointments/s400/family', isS400: true },
+  { id: 'consultant', category: 'Consultant', title: 'רפואה יועצת', subtitle: 'ייעוץ מומחים', icon: '🩺', href: '/appointments/s400/consultant', isS400: true },
+  { id: 'institutes', category: 'Institutes', title: 'מכונים', subtitle: 'מעבדות, דימות ומכונים', icon: '🏥', href: '/appointments/qf/institutes', isS400: false },
 ];
 
 export default function AppointmentsCenterPage({
@@ -37,6 +35,8 @@ export default function AppointmentsCenterPage({
 
   if (!patient) return null;
 
+  const openReferrals = store.getAllPatientReferrals(patientId).filter(r => r.status === 'Open').length;
+
   return (
     <div className="animate-fade-in">
       {/* Page title */}
@@ -45,24 +45,8 @@ export default function AppointmentsCenterPage({
         <p className="text-sm text-gray-500 mt-1">בחר שירות לקביעת תור</p>
       </div>
 
-      {/* Service Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Referrals card */}
-        <ServiceCard
-          title="הפניות"
-          subtitle="צפייה וניהול הפניות מטופל"
-          icon="📄"
-          highlighted={true}
-          statusBadge={{ label: 'זמין', variant: 'available' }}
-          contextRows={[
-            { label: 'הפניות פתוחות', value: `${store.getAllPatientReferrals(patientId).filter(r => r.status === 'Open').length}`, emphasis: true },
-          ]}
-          primaryAction={{
-            label: 'צפייה בהפניות',
-            href: `/patient/${patientId}/referrals`,
-          }}
-        />
-
+      {/* Service Cards — 4 sections */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {SERVICES.map((svc) => {
           const nextApt = store.getNextAppointmentByCategory(patientId, svc.category);
           const lastApt = store.getLastAppointmentByCategory(patientId, svc.category);
@@ -79,12 +63,9 @@ export default function AppointmentsCenterPage({
               label: 'תור אחרון',
               value: lastApt ? formatDate(lastApt.startISO) : 'אין',
             },
-            ...(svc.id === 'ultrasound'
-              ? [{ label: 'זמן המתנה משוער', value: '3-7 ימים' }]
-              : []),
           ];
 
-          const isQF = svc.id === 'ultrasound';
+          const isQF = !svc.isS400;
 
           return (
             <ServiceCard
@@ -100,12 +81,28 @@ export default function AppointmentsCenterPage({
               }
               contextRows={contextRows}
               primaryAction={{
-                label: 'זימון תור',
+                label: svc.id === 'institutes' ? 'חיפוש וזימון' : 'זימון תור',
                 href: `/patient/${patientId}${svc.href}`,
               }}
             />
           );
         })}
+
+        {/* Referrals card */}
+        <ServiceCard
+          title="הפניות"
+          subtitle="צפייה וניהול הפניות מטופל"
+          icon="📄"
+          highlighted={true}
+          statusBadge={{ label: 'זמין', variant: 'available' }}
+          contextRows={[
+            { label: 'הפניות פתוחות', value: `${openReferrals}`, emphasis: openReferrals > 0 },
+          ]}
+          primaryAction={{
+            label: 'צפייה בהפניות',
+            href: `/patient/${patientId}/referrals`,
+          }}
+        />
       </div>
     </div>
   );
