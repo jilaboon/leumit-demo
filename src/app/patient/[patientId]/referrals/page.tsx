@@ -18,6 +18,7 @@ const referrals: ReferralRow[] = [
   { id: 3, serviceCode: '221', serviceName: 'אולטרסאונד כללי', schedulingSystem: 'QFlow', status: 'Open' },
   { id: 4, serviceCode: '222', serviceName: 'אולטרסאונד גינקולוגי', schedulingSystem: 'BossaNova', status: 'Open' },
   { id: 5, serviceCode: '213', serviceName: 'בדיקות דם', schedulingSystem: 'BossaNova', status: 'Open' },
+  { id: 6, serviceCode: '223', serviceName: 'אולטרסאונד בטן', schedulingSystem: 'QFlow', status: 'Open' },
 ];
 
 export default function ReferralsPage({
