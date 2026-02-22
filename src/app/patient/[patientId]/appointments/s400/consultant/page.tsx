@@ -39,6 +39,7 @@ function ConsultantSearchInner({
 
   // Pre-fill from query param (e.g., from referrals page)
   const prefillSpecialty = searchParams.get('specialty');
+  const fromReferrals = searchParams.get('from') === 'referrals';
   useEffect(() => {
     if (!prefillSpecialty) return;
     setSpecialty(prefillSpecialty);
@@ -134,10 +135,10 @@ function ConsultantSearchInner({
         </div>
 
         <div className="border-t border-gray-700 pt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs mt-8">
-          <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
-            <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">=חזרה לזימון</span>
+          <button onClick={() => router.push(fromReferrals ? `/patient/${patientId}/referrals` : `/patient/${patientId}/appointments/book`)} className="hover:text-white">
+            <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">{fromReferrals ? '=חזרה להפניות' : '=חזרה לזימון'}</span>
           </button>
-          <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
+          <button onClick={() => router.push(fromReferrals ? `/patient/${patientId}/referrals` : `/patient/${patientId}/appointments/book`)} className="hover:text-white">
             <span className="text-[#ff00ff]">Enter</span><span className="text-[#33ff33]">=המשך</span>
           </button>
         </div>
@@ -286,8 +287,8 @@ function ConsultantSearchInner({
           <span className="text-[#ff00ff]">F1</span><span className="text-[#33ff33]">=הסבר</span>
         </button>
         <span><span className="text-[#ff00ff]">F2</span><span className="text-[#33ff33]">=הרופאים</span></span>
-        <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-white">
-          <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">=סיום</span>
+        <button onClick={() => router.push(fromReferrals ? `/patient/${patientId}/referrals` : `/patient/${patientId}/appointments/book`)} className="hover:text-white">
+          <span className="text-[#ff00ff]">F3</span><span className="text-[#33ff33]">{fromReferrals ? '=חזרה להפניות' : '=סיום'}</span>
         </button>
         <button onClick={handleSearch} className="hover:text-white">
           <span className="text-[#ff00ff]">F5</span><span className="text-[#33ff33]">=רענון</span>

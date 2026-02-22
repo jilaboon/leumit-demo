@@ -1,13 +1,24 @@
 'use client';
 
-import { use, useState, useMemo, useCallback } from 'react';
+import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
-import { useToast } from '@/components/Toast';
-import Badge from '@/components/Badge';
-import EmptyState from '@/components/EmptyState';
-import { formatDate } from '@/lib/utils';
-import { Referral } from '@/types';
+
+interface ReferralRow {
+  id: number;
+  serviceCode: string;
+  serviceName: string;
+  schedulingSystem: 'BossaNova' | 'QFlow';
+  status: string;
+}
+
+const referrals: ReferralRow[] = [
+  { id: 1, serviceCode: '141', serviceName: 'קרדיולוגיה', schedulingSystem: 'BossaNova', status: 'Open' },
+  { id: 2, serviceCode: '131', serviceName: 'גינקולוגיה', schedulingSystem: 'BossaNova', status: 'Open' },
+  { id: 3, serviceCode: '221', serviceName: 'אולטרסאונד כללי', schedulingSystem: 'QFlow', status: 'Open' },
+  { id: 4, serviceCode: '222', serviceName: 'אולטרסאונד גינקולוגי', schedulingSystem: 'BossaNova', status: 'Open' },
+  { id: 5, serviceCode: '213', serviceName: 'בדיקות דם', schedulingSystem: 'BossaNova', status: 'Open' },
+];
 
 export default function ReferralsPage({
   params,
@@ -17,94 +28,26 @@ export default function ReferralsPage({
   const { patientId } = use(params);
   const router = useRouter();
   const store = useStore();
-  const { showToast } = useToast();
-
   const patient = store.getPatient(patientId);
-
-  const handleReferralClick = useCallback((ref: Referral) => {
-    if (ref.status !== 'Open') return;
-    const code = ref.examCode;
-    const base = `/patient/${patientId}/appointments`;
-
-    if (code.startsWith('US-')) {
-      router.push(`${base}/qf/ultrasound/book?prefill=${code}`);
-    } else if (code.startsWith('CRD-') || code.startsWith('ECG-')) {
-      router.push(`${base}/s400/consultant?specialty=קרדיולוגיה`);
-    } else if (code.startsWith('PHY-')) {
-      router.push(`${base}/s400/institutes?search=פיזיותרפיה`);
-    } else if (code.startsWith('BLD-')) {
-      router.push(`${base}/s400/institutes?search=בדיקות+דם`);
-    } else if (code.startsWith('GYN-')) {
-      router.push(`${base}/s400/consultant?specialty=גינקולוגיה`);
-    } else if (code.startsWith('EYE-')) {
-      router.push(`${base}/s400/consultant?specialty=עיניים`);
-    } else if (code.startsWith('SOC-') || code.startsWith('FIT-')) {
-      showToast('שירות זה אינו זמין לזימון אונליין', 'warning');
-    } else {
-      showToast('שירות זה אינו זמין לזימון אונליין', 'warning');
-    }
-  }, [patientId, router, showToast]);
-
-  // Date range: default 1 year back
-  const today = new Date();
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-
-  const [dateFrom, setDateFrom] = useState(oneYearAgo.toISOString().split('T')[0]);
-  const [dateTo, setDateTo] = useState(today.toISOString().split('T')[0]);
-
-  // Search fields
-  const [searchCode, setSearchCode] = useState('');
-  const [searchDoctor, setSearchDoctor] = useState('');
-  const [searchNumber, setSearchNumber] = useState('');
 
   if (!patient) return null;
 
-  const allReferrals = store.getAllPatientReferrals(patientId);
+  const handleRowClick = (row: ReferralRow) => {
+    const base = `/patient/${patientId}/appointments`;
 
-  const filteredReferrals = useMemo(() => {
-    let results = allReferrals;
-
-    // Date range filter
-    const from = new Date(dateFrom);
-    from.setHours(0, 0, 0, 0);
-    const to = new Date(dateTo);
-    to.setHours(23, 59, 59, 999);
-
-    results = results.filter((r) => {
-      const created = new Date(r.createdISO);
-      return created >= from && created <= to;
-    });
-
-    // Search by exam code
-    if (searchCode.trim()) {
-      const q = searchCode.trim().toLowerCase();
-      results = results.filter((r) => r.examCode.toLowerCase().includes(q));
+    if (row.schedulingSystem === 'QFlow') {
+      // Route to QF booking with pre-fill
+      router.push(`${base}/qf/ultrasound/book?prefill=${encodeURIComponent(row.serviceName)}&from=referrals`);
+    } else {
+      // Route to BossaNova — determine the right S400 page
+      if (row.serviceName === 'קרדיולוגיה') {
+        router.push(`${base}/s400/consultant?specialty=קרדיולוגיה&from=referrals`);
+      } else if (row.serviceName === 'גינקולוגיה') {
+        router.push(`${base}/s400/consultant?specialty=גינקולוגיה&from=referrals`);
+      } else {
+        router.push(`${base}/s400/institutes?search=${encodeURIComponent(row.serviceName)}&from=referrals`);
+      }
     }
-
-    // Search by referring doctor
-    if (searchDoctor.trim()) {
-      const q = searchDoctor.trim();
-      results = results.filter((r) => r.referringDoctor.includes(q));
-    }
-
-    // Search by referral number
-    if (searchNumber.trim()) {
-      const q = searchNumber.trim().toLowerCase();
-      results = results.filter((r) => r.referralNumber.toLowerCase().includes(q));
-    }
-
-    return results;
-  }, [allReferrals, dateFrom, dateTo, searchCode, searchDoctor, searchNumber]);
-
-  const statusLabel = (status: string) => {
-    const map: Record<string, string> = {
-      Open: 'פתוחה',
-      Used: 'נוצלה',
-      Expired: 'פג תוקף',
-      Canceled: 'בוטלה',
-    };
-    return map[status] || status;
   };
 
   return (
@@ -117,145 +60,80 @@ export default function ReferralsPage({
         >
           זימון תור חדש
         </button>
-        <span>←</span>
-        <span className="text-gray-900 font-medium">הפניות</span>
+        <span>&larr;</span>
+        <span className="text-gray-900 font-medium">הפניות מטופל</span>
       </div>
 
-      <h2 className="text-xl font-bold text-gray-900 mb-6">הפניות מטופל</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-2">הפניות מטופל</h2>
+      <p className="text-sm text-gray-500 mb-6">
+        לחץ על הפנייה לזימון תור — המערכת תנתב אוטומטית למערכת הזימון המתאימה
+      </p>
 
-      {/* Filters */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 space-y-4">
-        {/* Date range */}
-        <div className="flex flex-wrap items-center gap-4">
-          <span className="text-sm font-medium text-gray-700">טווח תאריכים:</span>
-          <div className="flex items-center gap-2">
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
-              dir="ltr"
-            />
-            <span className="text-gray-400">—</span>
-            <input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
-              dir="ltr"
-            />
-          </div>
-        </div>
-
-        {/* Search fields */}
-        <div className="flex flex-wrap gap-3">
-          <div className="flex-1 min-w-[160px]">
-            <label className="block text-xs text-gray-500 mb-1">קוד בדיקה</label>
-            <input
-              type="text"
-              value={searchCode}
-              onChange={(e) => setSearchCode(e.target.value)}
-              placeholder='לדוגמה: "BLD-100"'
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
-              dir="ltr"
-            />
-          </div>
-          <div className="flex-1 min-w-[160px]">
-            <label className="block text-xs text-gray-500 mb-1">רופא מפנה</label>
-            <input
-              type="text"
-              value={searchDoctor}
-              onChange={(e) => setSearchDoctor(e.target.value)}
-              placeholder="שם הרופא..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
-            />
-          </div>
-          <div className="flex-1 min-w-[160px]">
-            <label className="block text-xs text-gray-500 mb-1">מספר הפנייה</label>
-            <input
-              type="text"
-              value={searchNumber}
-              onChange={(e) => setSearchNumber(e.target.value)}
-              placeholder='לדוגמה: "HP-2025"'
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
-              dir="ltr"
-            />
-          </div>
-        </div>
-
-        {/* Clear filters */}
-        {(searchCode || searchDoctor || searchNumber) && (
-          <button
-            onClick={() => { setSearchCode(''); setSearchDoctor(''); setSearchNumber(''); }}
-            className="text-xs text-red-500 hover:text-red-700 underline"
-          >
-            נקה חיפוש
-          </button>
-        )}
-      </div>
-
-      {/* Results table */}
+      {/* Referrals table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-gray-900">תוצאות</h3>
-          <span className="text-xs text-gray-400">{filteredReferrals.length} הפניות</span>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="text-right py-3.5 px-5 text-xs font-semibold text-gray-600">מס׳ הפנייה</th>
+                <th className="text-right py-3.5 px-5 text-xs font-semibold text-gray-600">קוד שירות</th>
+                <th className="text-right py-3.5 px-5 text-xs font-semibold text-gray-600">שם שירות</th>
+                <th className="text-right py-3.5 px-5 text-xs font-semibold text-gray-600">מערכת זימון</th>
+                <th className="text-right py-3.5 px-5 text-xs font-semibold text-gray-600">סטטוס</th>
+                <th className="py-3.5 px-5 w-10"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {referrals.map((row) => {
+                const isQF = row.schedulingSystem === 'QFlow';
+                return (
+                  <tr
+                    key={row.id}
+                    onClick={() => handleRowClick(row)}
+                    className="border-b border-gray-50 cursor-pointer hover:bg-teal-50/50 transition-colors group"
+                  >
+                    <td className="py-3.5 px-5 font-medium text-gray-900">{row.id}</td>
+                    <td className="py-3.5 px-5 font-mono text-gray-600">{row.serviceCode}</td>
+                    <td className="py-3.5 px-5 font-medium text-gray-900">{row.serviceName}</td>
+                    <td className="py-3.5 px-5">
+                      <span className={`
+                        inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full
+                        ${isQF
+                          ? 'bg-teal-100 text-teal-700'
+                          : 'bg-amber-100 text-amber-700'
+                        }
+                      `}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isQF ? 'bg-teal-500' : 'bg-amber-500'}`} />
+                        {row.schedulingSystem}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-5">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        פתוחה
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-5 text-center">
+                      <span className="text-gray-300 group-hover:text-teal-500 transition-colors text-lg">&larr;</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
+      </div>
 
-        {filteredReferrals.length === 0 ? (
-          <div className="p-5">
-            <EmptyState
-              icon="📄"
-              title="לא נמצאו הפניות"
-              description="נסה לשנות את טווח התאריכים או את שדות החיפוש"
-            />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">קוד בדיקה</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">שם הבדיקה</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">רופא מפנה</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">מספר הפנייה</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">תאריך</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-500">סטטוס</th>
-                  <th className="py-3 px-4 w-10"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredReferrals.map((ref) => {
-                  const isOpen = ref.status === 'Open';
-                  return (
-                    <tr
-                      key={ref.id}
-                      onClick={isOpen ? () => handleReferralClick(ref) : undefined}
-                      className={`border-b border-gray-50 transition-colors ${
-                        isOpen
-                          ? 'cursor-pointer hover:bg-teal-50/50'
-                          : 'hover:bg-gray-50'
-                      }`}
-                    >
-                      <td className="py-3 px-4 font-mono text-xs text-gray-600" dir="ltr">{ref.examCode}</td>
-                      <td className="py-3 px-4 font-medium text-gray-900">{ref.examName}</td>
-                      <td className="py-3 px-4 text-gray-700">{ref.referringDoctor}</td>
-                      <td className="py-3 px-4 font-mono text-xs text-gray-600" dir="ltr">{ref.referralNumber}</td>
-                      <td className="py-3 px-4 text-gray-700">{formatDate(ref.createdISO)}</td>
-                      <td className="py-3 px-4">
-                        <Badge status={ref.status} label={statusLabel(ref.status)} />
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        {isOpen && (
-                          <span className="text-teal-500 text-sm">←</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+      {/* Legend */}
+      <div className="mt-4 flex items-center gap-6 text-xs text-gray-400">
+        <div className="flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">QFlow</span>
+          <span>זימון מהיר — מערכת חדשה</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">BossaNova</span>
+          <span>מערכת קיימת</span>
+        </div>
       </div>
     </div>
   );

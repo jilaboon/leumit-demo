@@ -83,6 +83,8 @@ function BookPageInner({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefill]);
 
+  const fromReferrals = searchParams.get('from') === 'referrals';
+
   if (!patient) return null;
 
   const handleSearch = () => {
@@ -184,11 +186,23 @@ function BookPageInner({
     <div className="animate-fade-in">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-teal-600 transition-colors">
-          זימון תור חדש
-        </button>
-        <span>←</span>
-        <span className="text-gray-900 font-medium">חיפוש תור אולטרסאונד</span>
+        {fromReferrals ? (
+          <>
+            <button onClick={() => router.push(`/patient/${patientId}/referrals`)} className="hover:text-teal-600 transition-colors">
+              הפניות מטופל
+            </button>
+            <span>&larr;</span>
+            <span className="text-gray-900 font-medium">QFlow — חיפוש תור אולטרסאונד</span>
+          </>
+        ) : (
+          <>
+            <button onClick={() => router.push(`/patient/${patientId}/appointments/book`)} className="hover:text-teal-600 transition-colors">
+              זימון תור חדש
+            </button>
+            <span>&larr;</span>
+            <span className="text-gray-900 font-medium">חיפוש תור אולטרסאונד</span>
+          </>
+        )}
       </div>
 
       <h2 className="text-xl font-bold text-gray-900 mb-6">חיפוש תור אולטרסאונד</h2>
